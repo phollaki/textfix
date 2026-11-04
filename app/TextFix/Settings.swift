@@ -15,8 +15,8 @@ final class SettingsModel: ObservableObject {
     private var monitor: Any?
 
     @Published var trusted = AXIsProcessTrusted()
-    @Published var shortcuts = Dictionary(uniqueKeysWithValues: Mode.allCases.map { ($0, HotKeys.shortcut(for: $0)) })
-    @Published var recording: Mode?
+    @Published var shortcuts = Dictionary(uniqueKeysWithValues: HotKey.allCases.map { ($0, HotKeys.shortcut(for: $0)) })
+    @Published var recording: HotKey?
     @Published var shortcutError: String?
     @Published var loginError: String?
     @Published var launchAtLogin = SMAppService.mainApp.status == .enabled
@@ -48,6 +48,21 @@ final class SettingsModel: ObservableObject {
             testResult = nil
         }
     }
+    @Published var hideData = UserDefaults.standard.bool(forKey: "hideData") {
+        didSet { UserDefaults.standard.set(hideData, forKey: "hideData") }
+    }
+    @Published var hiddenWords = UserDefaults.standard.string(forKey: "hiddenWords") ?? "" {
+        didSet { UserDefaults.standard.set(hiddenWords, forKey: "hiddenWords") }
+    }
+    @Published var findNames = UserDefaults.standard.object(forKey: "findNames") as? Bool ?? true {
+        didSet { UserDefaults.standard.set(findNames, forKey: "findNames") }
+    }
+    @Published var glossary = UserDefaults.standard.string(forKey: "glossary") ?? "" {
+        didSet { UserDefaults.standard.set(glossary, forKey: "glossary") }
+    }
+    @Published var style = UserDefaults.standard.string(forKey: "style") ?? "" {
+        didSet { UserDefaults.standard.set(style, forKey: "style") }
+    }
     @Published var models: [String] = []
     @Published var testing = false
     @Published var testResult: (ok: Bool, message: String)?
@@ -60,9 +75,22 @@ final class SettingsModel: ObservableObject {
 
     var ready: Bool { (!provider.needsKey || !apiKey.isEmpty) && !modelName.isEmpty }
 
-    func request(for mode: Mode) -> RewriteRequest? {
+    func request(for mode: Mode, instruction: String = "") -> RewriteRequest? {
         guard ready else { return nil }
-        return RewriteRequest(mode: mode, language: language, provider: provider, model: modelName, key: apiKey)
+        let words = hiddenWords.split(whereSeparator: \.isNewline)
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+        return RewriteRequest(
+            mode: mode,
+            instruction: instruction,
+            language: language,
+            provider: provider,
+            model: modelName,
+            key: apiKey,
+            glossary: glossary.trimmingCharacters(in: .whitespacesAndNewlines),
+            style: style.trimmingCharacters(in: .whitespacesAndNewlines),
+            privacy: hideData ? PrivacyOptions(words: words, findNames: findNames) : nil
+        )
     }
 
     func loadModels() {
@@ -112,7 +140,7 @@ final class SettingsModel: ObservableObject {
         }
     }
 
-    func record(_ mode: Mode) {
+    func record(_ mode: HotKey) {
         stopRecording()
         shortcutError = nil
         recording = mode
@@ -123,7 +151,7 @@ final class SettingsModel: ObservableObject {
         }
     }
 
-    private func handle(_ event: NSEvent, for mode: Mode) {
+    private func handle(_ event: NSEvent, for mode: HotKey) {
         if event.keyCode == 53 {
             stopRecording()
             return
@@ -228,7 +256,7 @@ struct SettingsView: View {
             }
 
             Section("Shortcuts") {
-                ForEach(Mode.allCases, id: \.self) { mode in
+                ForEach(HotKey.allCases, id: \.self) { mode in
                     LabeledContent(mode.title) {
                         Button(model.recording == mode ? "Press a shortcut…" : model.shortcuts[mode]?.label ?? "") {
                             model.recording == mode ? model.stopRecording() : model.record(mode)
@@ -242,6 +270,25 @@ struct SettingsView: View {
                 Picker("Translate to", selection: $model.language) {
                     ForEach(languages, id: \.self) { Text($0) }
                 }
+                Text("Quick actions opens a list with more actions: TL;DR, reply ideas, explain, make it shorter, prompt from your text, or type your own instruction.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+
+            Section("Privacy") {
+                Toggle("Hide sensitive data before sending", isOn: $model.hideData)
+                Text("Emails, phone numbers, IBANs, IP addresses and the names below are replaced with placeholders like [NAME_1]. TextFix puts the real values back after the answer.")
+                    .font(.caption).foregroundStyle(.secondary)
+                if model.hideData {
+                    editor("Always hide, one name or company per line", text: $model.hiddenWords)
+                    Toggle("Also find other names automatically", isOn: $model.findNames)
+                    Text("Uses Apple's on-device language detection. Works best in English and German. This lowers what leaves your Mac, but it can miss things. For full privacy, use Ollama.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+            }
+
+            Section("Glossary and style") {
+                editor("Glossary, one per line. \"SIT\" keeps a word as it is. \"élesítés = deployment\" fixes a translation.", text: $model.glossary)
+                editor("My style: rules or an example message. Used by Rephrase, Make it shorter, Reply ideas and your own instructions.", text: $model.style)
             }
 
             Section {
@@ -262,6 +309,16 @@ struct SettingsView: View {
         .onAppear { model.loadModels() }
         .onReceive(timer) { _ in model.trusted = AXIsProcessTrusted() }
         .onDisappear { model.stopRecording() }
+    }
+
+    private func editor(_ title: String, text: Binding<String>) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title).font(.caption).foregroundStyle(.secondary)
+            TextEditor(text: text)
+                .font(.body)
+                .frame(height: 64)
+                .overlay(RoundedRectangle(cornerRadius: 6).stroke(.quaternary))
+        }
     }
 }
 

@@ -11,11 +11,42 @@ It works in Mail, Slack, Teams, Notes, your browser and every other app where yo
 
 | Shortcut | Action |
 |---|---|
-| Control+Option+R | Rephrase into plain, natural sentences |
-| Control+Option+G | Fix spelling, grammar and punctuation |
+| Control+Option+R | Rephrase so it sounds like a native speaker wrote it |
+| Control+Option+G | Fix every mistake, without rephrasing |
 | Control+Option+T | Translate to the language you pick (24 languages) |
+| Control+Option+Space | Open quick actions |
 
 You can change every shortcut in the settings.
+
+### Quick actions
+
+Quick actions open a small search list over your current app.
+Use the arrow keys and Enter, or type to search.
+
+<p align="center"><img src="docs/palette.png" width="420" alt="TextFix quick actions" /> <img src="docs/prompt.png" width="330" alt="Prompt from my text result" /></p>
+
+| Action | Result |
+|---|---|
+| Make it shorter | Replaces the selection |
+| Prompt from my text | Turns rough notes into a clear AI prompt. Shows it with a Copy button. Your text stays. |
+| Your own instruction | Type anything, for example "make it more polite", and press Enter |
+| TL;DR | Shows up to three bullet points. Your text stays. |
+| Reply ideas | Shows three short replies. Click one to copy it. |
+| Explain | Explains the text in plain words. Your text stays. |
+
+### Privacy, glossary and style
+
+These are optional, in the settings.
+
+- Hide sensitive data: before sending, TextFix replaces names from your list, emails, phone numbers, IBANs and IP addresses with placeholders like `[NAME_1]`, and puts the real values back in the answer.
+  It can also find other names with Apple's on-device language detection, which works best in English and German.
+  This lowers what leaves your Mac, but it can miss things.
+  For full privacy, use Ollama.
+- Glossary: one term per line.
+  `SIT` keeps a word as it is, `élesítés = deployment` always translates it this way.
+- My style: rules or an example message.
+  Used by Rephrase, Make it shorter, Reply ideas and your own instructions.
+  Fix grammar never uses it.
 
 <p align="center"><img src="docs/settings.png" width="420" alt="TextFix settings" /></p>
 

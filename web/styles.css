@@ -568,6 +568,16 @@ section h2 {
   margin: 0 auto 44px;
 }
 
+.shot {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+  margin: 0 auto 44px;
+  border-radius: 14px;
+  box-shadow: var(--card-shadow);
+}
+
 .note {
   font-size: 14px;
   color: var(--muted);

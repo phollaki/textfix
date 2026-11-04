@@ -1,25 +1,20 @@
 import AppKit
 import ApplicationServices
-import Carbon
 
-enum Mode: UInt32, CaseIterable {
-    case rephrase = 1
-    case grammar = 2
-    case translate = 3
-
-    var argument: String {
-        switch self {
-        case .rephrase: return "rephrase"
-        case .grammar: return "grammar"
-        case .translate: return "translate"
-        }
-    }
+enum Mode {
+    case rephrase, grammar, translate, shorter, prompt, tldr, replies, explain, custom
 
     var title: String {
         switch self {
         case .rephrase: return "Rephrase"
         case .grammar: return "Fix grammar"
         case .translate: return "Translate"
+        case .shorter: return "Make it shorter"
+        case .prompt: return "Prompt from my text"
+        case .tldr: return "TL;DR"
+        case .replies: return "Reply ideas"
+        case .explain: return "Explain"
+        case .custom: return "Your instruction"
         }
     }
 
@@ -28,15 +23,19 @@ enum Mode: UInt32, CaseIterable {
         case .rephrase: return "Rephrasing…"
         case .grammar: return "Fixing grammar…"
         case .translate: return "Translating…"
+        case .shorter: return "Shortening…"
+        case .prompt: return "Writing prompt…"
+        case .tldr: return "Summarizing…"
+        case .replies: return "Writing replies…"
+        case .explain: return "Explaining…"
+        case .custom: return "Working…"
         }
     }
 
-    var defaultShortcut: Shortcut {
-        let modifiers = UInt32(controlKey | optionKey)
+    var replacesText: Bool {
         switch self {
-        case .rephrase: return Shortcut(keyCode: UInt32(kVK_ANSI_R), modifiers: modifiers, key: "R")
-        case .grammar: return Shortcut(keyCode: UInt32(kVK_ANSI_G), modifiers: modifiers, key: "G")
-        case .translate: return Shortcut(keyCode: UInt32(kVK_ANSI_T), modifiers: modifiers, key: "T")
+        case .prompt, .tldr, .replies, .explain: return false
+        default: return true
         }
     }
 }
@@ -99,6 +98,8 @@ final class TextFix: NSObject, NSApplicationDelegate, @unchecked Sendable {
     private let pasteboard = NSPasteboard.general
     private let loading = LoadingPanel()
     private let hotKeys = HotKeys()
+    @MainActor private lazy var palette = Palette()
+    @MainActor private lazy var results = ResultPanel()
     private var settings: SettingsWindow?
     private var busy = false
 
@@ -131,46 +132,88 @@ final class TextFix: NSObject, NSApplicationDelegate, @unchecked Sendable {
     }
 
     @MainActor
-    func run(_ mode: Mode) {
+    func run(_ hotKey: HotKey) {
         guard !busy else { return }
-        guard AXIsProcessTrusted() else {
-            settings?.show()
-            return
-        }
-        guard let request = settings?.model.request(for: mode) else {
+        guard AXIsProcessTrusted(), let model = settings?.model, model.ready else {
             settings?.show()
             return
         }
         busy = true
-        statusItem.button?.title = "…"
-        loading.show(mode.loadingTitle)
+        let mode = hotKey.mode
+        if let mode { showLoading(mode) }
         let app = NSWorkspace.shared.frontmostApplication
 
         DispatchQueue.global(qos: .userInitiated).async {
             self.waitForModifierRelease()
             let saved = self.savePasteboard()
-            let error = self.process(request, app: app, saved: saved)
+            guard let text = self.copySelection() else {
+                NSSound.beep()
+                Task { @MainActor in self.finish(nil) }
+                return
+            }
             Task { @MainActor in
-                self.busy = false
-                self.loading.hide()
-                self.statusItem.button?.title = "✎"
-                if let error { self.show(error) }
+                if let mode {
+                    self.send(text, model.request(for: mode), app: app, saved: saved)
+                    return
+                }
+                self.palette.show(language: model.language) { choice in
+                    guard let choice else {
+                        self.restore(saved)
+                        self.finish(nil)
+                        return
+                    }
+                    app?.activate()
+                    self.showLoading(choice.mode)
+                    self.send(text, model.request(for: choice.mode, instruction: choice.instruction), app: app, saved: saved)
+                }
             }
         }
     }
 
-    private func process(_ request: RewriteRequest, app: NSRunningApplication?, saved: [NSPasteboardItem]) -> String? {
+    @MainActor
+    private func showLoading(_ mode: Mode) {
+        statusItem.button?.title = "…"
+        loading.show(mode.loadingTitle)
+    }
+
+    @MainActor
+    private func finish(_ error: String?) {
+        busy = false
+        loading.hide()
+        statusItem.button?.title = "✎"
+        if let error { show(error) }
+    }
+
+    @MainActor
+    private func send(_ text: String, _ request: RewriteRequest?, app: NSRunningApplication?, saved: [NSPasteboardItem]) {
+        guard let request else {
+            restore(saved)
+            finish(nil)
+            return
+        }
+        nonisolated(unsafe) let saved = saved
+        DispatchQueue.global(qos: .userInitiated).async {
+            let error = self.process(text, request, app: app, saved: saved)
+            Task { @MainActor in self.finish(error) }
+        }
+    }
+
+    private func copySelection() -> String? {
         let count = pasteboard.changeCount
         press(key: 8)
-        guard waitForCopy(after: count), let text = pasteboard.string(forType: .string) else {
-            NSSound.beep()
-            return nil
-        }
+        guard waitForCopy(after: count) else { return nil }
+        return pasteboard.string(forType: .string)
+    }
 
+    private func process(_ text: String, _ request: RewriteRequest, app: NSRunningApplication?, saved: [NSPasteboardItem]) -> String? {
         switch AI.rewrite(text, request) {
         case .failure(let error):
             restore(saved)
             return error.message
+        case .success(let output) where !request.mode.replacesText:
+            restore(saved)
+            Task { @MainActor in self.results.show(output, mode: request.mode) }
+            return nil
         case .success(let output):
             pasteboard.clearContents()
             pasteboard.setString(output, forType: .string)

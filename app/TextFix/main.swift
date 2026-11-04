@@ -11,7 +11,7 @@ var eventType = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind
 InstallEventHandler(GetApplicationEventTarget(), { _, event, _ in
     var id = EventHotKeyID()
     GetEventParameter(event, EventParamName(kEventParamDirectObject), EventParamType(typeEventHotKeyID), nil, MemoryLayout<EventHotKeyID>.size, nil, &id)
-    if let mode = Mode(rawValue: id.id) { MainActor.assumeIsolated { textFix.run(mode) } }
+    if let hotKey = HotKey(rawValue: id.id) { MainActor.assumeIsolated { textFix.run(hotKey) } }
     return noErr
 }, 1, &eventType, nil, nil)
 

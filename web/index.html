@@ -117,13 +117,13 @@
             <div class="card reveal" style="--d: 0s">
               <div class="icon">Aa</div>
               <h3>Rephrase</h3>
-              <p>Turns stiff or clumsy text into plain, natural sentences. Keeps your meaning and every fact.</p>
+              <p>Rewrites your text so it sounds like a native speaker wrote it. Keeps your meaning, your tone and every fact.</p>
               <p class="note"><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>R</kbd></p>
             </div>
             <div class="card reveal" style="--d: 0.1s">
               <div class="icon">✓</div>
               <h3>Fix grammar</h3>
-              <p>Fixes spelling, grammar and punctuation. Nothing else. Your words and your style stay.</p>
+              <p>Fixes every mistake in spelling, grammar and punctuation. It does not rephrase. Your words and your style stay.</p>
               <p class="note"><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>G</kbd></p>
             </div>
             <div class="card reveal" style="--d: 0.2s">
@@ -131,6 +131,29 @@
               <h3>Translate</h3>
               <p>Translates the selection into the language you pick. 24 languages, faithful and correct.</p>
               <p class="note"><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>T</kbd></p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="reveal">One more shortcut for everything else</h2>
+          <p class="lead reveal">Press Control + Option + Space to open quick actions. Type to search, press Enter to run.</p>
+          <img class="shot reveal" src="palette.png" width="560" height="534" alt="TextFix quick actions: Rephrase, Fix grammar, Translate, Make it shorter, TL;DR, Reply ideas, Explain and Prompt from my text" loading="lazy" />
+          <div class="grid">
+            <div class="card reveal" style="--d: 0s">
+              <div class="icon">≡</div>
+              <h3>TL;DR and reply ideas</h3>
+              <p>Get a three-point summary of a long message, or three short replies to choose from. Your text stays as it is.</p>
+            </div>
+            <div class="card reveal" style="--d: 0.1s">
+              <div class="icon">✦</div>
+              <h3>Prompt from your notes</h3>
+              <p>Turns rough notes into a clear prompt for ChatGPT or Claude, ready to copy. Or type your own instruction, like "make it more polite".</p>
+            </div>
+            <div class="card reveal" style="--d: 0.2s">
+              <div class="icon">⚿</div>
+              <h3>Hide names</h3>
+              <p>Optional. Names, companies, emails, phone numbers and IBANs are replaced with placeholders before sending, and put back after.</p>
             </div>
           </div>
         </section>
@@ -197,6 +220,14 @@
           <details class="reveal">
             <summary>Can I use it without the cloud?</summary>
             <p>Yes. Install <a href="https://ollama.com">Ollama</a>, download a model, and choose "Ollama (on this Mac)" in the settings. Your text never leaves your Mac.</p>
+          </details>
+          <details class="reveal">
+            <summary>How does "Hide sensitive data" work?</summary>
+            <p>Before sending, TextFix replaces the names on your "always hide" list, emails, phone numbers, IBANs and IP addresses with placeholders like [NAME_1]. It can also find other names on your Mac, which works best in English and German. The answer comes back with placeholders, and TextFix puts the real values back. This lowers what leaves your Mac, but it can miss things. For full privacy, use Ollama.</p>
+          </details>
+          <details class="reveal">
+            <summary>Can TextFix use my own words and style?</summary>
+            <p>Yes. Add a glossary with terms to keep or to always translate the same way, and describe your style or paste an example message. You find both in the settings.</p>
           </details>
           <details class="reveal" id="first-open">
             <summary>macOS says it cannot check TextFix for malware</summary>
