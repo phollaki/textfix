@@ -2,7 +2,7 @@
 
 <h1 align="center">TextFix</h1>
 
-<p align="center">Fix any text on your Mac with one shortcut.<br />Free, open source, and works with your own AI key.</p>
+<p align="center">Fix any text on your Mac with one shortcut.<br />Free, source available, and works with your own AI key.</p>
 
 <p align="center"><a href="https://github.com/phollaki/textfix/releases/latest/download/TextFix.dmg"><b>Download TextFix for Mac</b></a> · <a href="https://textfix.puteanihollakos.com">Website</a></p>
 
@@ -32,7 +32,7 @@ You can change every shortcut in the settings.
 5. Pick your AI provider, paste your API key and click "Test".
 
 TextFix lives in the menu bar (✎).
-Click the icon and choose "Settings…" to open the window again.
+Click the icon and choose "Settings…" to change the provider, the model or the shortcuts.
 
 Requires macOS 14 or later, on Apple Silicon or Intel.
 
@@ -112,6 +112,9 @@ The server config lives in `srv/textfix/compose.yml` and `srv/proxy/sites/textfi
 
 ## License
 
-[MIT](LICENSE)
+TextFix is free for personal and other noncommercial use under the [PolyForm Noncommercial License 1.0.0](LICENSE).
+You can read, change and share the code.
+You can't sell it or use it in a commercial product.
+For commercial use, contact me.
 
 Made by [Ákos](https://puteanihollakos.com).
