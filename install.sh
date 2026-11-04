@@ -6,7 +6,7 @@ app=/Applications/TextFix.app
 agent=~/Library/LaunchAgents/com.akos.textfix.plist
 build=$(mktemp -d)
 
-swiftc -O TextFix.swift -o "$build/TextFix"
+swiftc -O -target arm64-apple-macos14.0 TextFix.swift -o "$build/TextFix"
 swift icon.swift "$build/icon.png"
 mkdir "$build/AppIcon.iconset"
 for size in 16 32 128 256 512; do
