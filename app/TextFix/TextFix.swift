@@ -104,9 +104,7 @@ final class TextFix: NSObject, NSApplicationDelegate, @unchecked Sendable {
 
     @MainActor
     func start() {
-        let store = Store()
-        store.start()
-        let model = SettingsModel(store: store, hotKeys: hotKeys)
+        let model = SettingsModel(hotKeys: hotKeys)
         settings = SettingsWindow(model: model)
 
         statusItem.button?.title = "✎"
@@ -119,7 +117,7 @@ final class TextFix: NSObject, NSApplicationDelegate, @unchecked Sendable {
 
         hotKeys.registerAll()
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
-        if !AXIsProcessTrustedWithOptions(options) { settings?.show() }
+        if !AXIsProcessTrustedWithOptions(options) || !model.ready { settings?.show() }
     }
 
     @MainActor @objc private func openSettings() {
@@ -139,49 +137,50 @@ final class TextFix: NSObject, NSApplicationDelegate, @unchecked Sendable {
             settings?.show()
             return
         }
-        guard let model = settings?.model else { return }
+        guard let request = settings?.model.request(for: mode) else {
+            settings?.show()
+            return
+        }
         busy = true
         statusItem.button?.title = "…"
         loading.show(mode.loadingTitle)
         let app = NSWorkspace.shared.frontmostApplication
-        let request = RewriteRequest(mode: mode, language: model.language, transaction: model.store.transaction)
 
         DispatchQueue.global(qos: .userInitiated).async {
             self.waitForModifierRelease()
             let saved = self.savePasteboard()
-            let (error, usage) = self.process(request, app: app, saved: saved)
+            let error = self.process(request, app: app, saved: saved)
             Task { @MainActor in
                 self.busy = false
                 self.loading.hide()
                 self.statusItem.button?.title = "✎"
-                if let usage { model.usage = usage }
                 if let error { self.show(error) }
             }
         }
     }
 
-    private func process(_ request: RewriteRequest, app: NSRunningApplication?, saved: [NSPasteboardItem]) -> (String?, Usage?) {
+    private func process(_ request: RewriteRequest, app: NSRunningApplication?, saved: [NSPasteboardItem]) -> String? {
         let count = pasteboard.changeCount
         press(key: 8)
         guard waitForCopy(after: count), let text = pasteboard.string(forType: .string) else {
             NSSound.beep()
-            return (nil, nil)
+            return nil
         }
 
-        switch API.rewrite(text, request) {
+        switch AI.rewrite(text, request) {
         case .failure(let error):
             restore(saved)
-            return (error.message, error.usage)
-        case .success(let (output, usage)):
+            return error.message
+        case .success(let output):
             pasteboard.clearContents()
             pasteboard.setString(output, forType: .string)
             guard NSWorkspace.shared.frontmostApplication?.processIdentifier == app?.processIdentifier else {
-                return ("You switched apps, so TextFix did not paste. The new text is in your clipboard.", usage)
+                return "You switched apps, so TextFix did not paste. The new text is in your clipboard."
             }
             press(key: 9)
             Thread.sleep(forTimeInterval: 1)
             restore(saved)
-            return (nil, usage)
+            return nil
         }
     }
 

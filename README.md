@@ -1,55 +1,90 @@
-# TextFix
+<p align="center"><img src="web/icon.png" width="128" alt="TextFix icon" /></p>
 
-TextFix is a Mac menu bar app that rewrites the selected text in any app.
-Select text, press a shortcut, and TextFix replaces the selection with the result.
-The app talks to a small backend that holds the OpenAI key, counts usage and checks App Store subscriptions.
+<h1 align="center">TextFix</h1>
 
-| Shortcut (default) | Action |
+<p align="center">Fix any text on your Mac with one shortcut.<br />Free, open source, and works with your own AI key.</p>
+
+<p align="center"><a href="https://github.com/phollaki/textfix/releases/latest/download/TextFix.dmg"><b>Download TextFix for Mac</b></a> · <a href="https://textfix.puteanihollakos.com">Website</a></p>
+
+Select text in any app, press a shortcut, and TextFix replaces the selection with the result.
+It works in Mail, Slack, Teams, Notes, your browser and every other app where you can copy and paste.
+
+| Shortcut | Action |
 |---|---|
-| Control+Option+R | Rephrase |
-| Control+Option+G | Fix grammar |
-| Control+Option+T | Translate to the language set in the settings |
+| Control+Option+R | Rephrase into plain, natural sentences |
+| Control+Option+G | Fix spelling, grammar and punctuation |
+| Control+Option+T | Translate to the language you pick (24 languages) |
 
-| Plan | Price | Limit |
+You can change every shortcut in the settings.
+
+<p align="center"><img src="docs/settings.png" width="420" alt="TextFix settings" /></p>
+
+## Install
+
+1. Download [TextFix.dmg](https://github.com/phollaki/textfix/releases/latest/download/TextFix.dmg).
+2. Open it and drag TextFix to Applications.
+3. Open TextFix from Applications.
+   The first time, macOS says it cannot check TextFix for malware, because the app is not notarized by Apple yet.
+   Click "Done", open System Settings > Privacy & Security, scroll down and click "Open Anyway" next to TextFix.
+4. In the TextFix window, click "Open Accessibility Settings" and turn on TextFix.
+   TextFix needs this to press Copy and Paste for you.
+   Then click "Restart TextFix".
+5. Pick your AI provider, paste your API key and click "Test".
+
+TextFix lives in the menu bar (✎).
+Click the icon and choose "Settings…" to open the window again.
+
+Requires macOS 14 or later, on Apple Silicon or Intel.
+
+## AI providers
+
+TextFix sends the selected text directly from your Mac to the provider you pick.
+There is no TextFix server.
+Your key is stored in the macOS Keychain.
+
+| Provider | Default model | Get a key |
 |---|---|---|
-| Free | $0 | 30 rewrites a month |
-| Pro Monthly | $2.99 / month | 2,000 rewrites a month |
-| Pro Yearly | $24.99 / year | 2,000 rewrites a month |
+| OpenAI | `gpt-6-luna` | [platform.openai.com](https://platform.openai.com/api-keys) |
+| Anthropic (Claude) | `claude-haiku-5-5` | [console.anthropic.com](https://console.anthropic.com/settings/keys) |
+| Google Gemini | `gemini-3.5-flash-lite` | [aistudio.google.com](https://aistudio.google.com/apikey) |
+| Mistral | `mistral-small-latest` | [console.mistral.ai](https://console.mistral.ai/api-keys) |
+| Groq | `openai/gpt-oss-20b` | [console.groq.com](https://console.groq.com/keys) |
+| OpenRouter | `openrouter/auto` | [openrouter.ai](https://openrouter.ai/settings/keys) |
+| Ollama (on your Mac) | first installed model | No key. Install [Ollama](https://ollama.com) and download a model. |
 
-Other limits: 4,000 characters per text, 10 requests per minute per install, and a global monthly OpenAI budget (`MONTHLY_BUDGET_USD`).
+You can type any model name, or click "Choose" to pick from the models your provider offers.
+The defaults are small, fast models.
+A typical rewrite costs a tiny fraction of a cent.
+
+## Build from source
+
+You need Xcode 16 or later.
+
+```sh
+git clone https://github.com/phollaki/textfix.git
+cd textfix
+open app/TextFix.xcodeproj
+```
+
+Run the TextFix scheme.
+With ad hoc signing, macOS drops the Accessibility permission after each rebuild.
+Set your own team in Signing & Capabilities to keep it.
+
+To build the DMG:
+
+```sh
+app/build-dmg.sh
+```
+
+The DMG is written to `app/build/TextFix.dmg`.
 
 ## Repository
 
 | Folder | Content |
 |---|---|
-| `app/` | Xcode project for the Mac app (sandboxed, StoreKit 2) |
-| `server/` | Backend: Node 24, Fastify, zod, SQLite (`node:sqlite`) |
-| `web/` | Landing page, privacy policy and support page |
-| `.github/workflows/deploy.yml` | Tests the server and pushes both images to GHCR |
-
-## Run locally
-
-Start the backend with your own OpenAI key:
-
-```sh
-cd server
-npm install
-OPENAI_API_KEY=... APPLE_ENVIRONMENT=Xcode PORT=3999 npm run dev
-npm test
-```
-
-Open `app/TextFix.xcodeproj` in Xcode and run the TextFix scheme.
-The scheme uses `app/Products.storekit`, so test purchases work without App Store Connect.
-To point a debug build at the local backend:
-
-```sh
-defaults write ~/Library/Containers/com.puteanihollakos.textfix/Data/Library/Preferences/com.puteanihollakos.textfix.plist apiURL http://localhost:3999
-```
-
-macOS only applies the Accessibility permission after the app restarts.
-Use the "Restart TextFix" button in the settings after you turn it on.
-With ad hoc signing, macOS drops the permission after each rebuild.
-Sign with your Apple Development certificate to keep it.
+| `app/` | Xcode project for the Mac app (Swift, AppKit, SwiftUI) |
+| `web/` | Website: landing page, privacy policy and support page |
+| `.github/workflows/deploy.yml` | Builds the website image and pushes it to GHCR |
 
 The app icon comes from `app/icon.swift`:
 
@@ -57,31 +92,26 @@ The app icon comes from `app/icon.swift`:
 swift app/icon.swift icon.png
 ```
 
-## Deploy
+## Release
 
-The server runs at `textfix.puteanihollakos.com`.
-Caddy sends `/api/*` to the `api` container and everything else to the `web` container.
-The server config lives in `~/server-setup/srv/textfix` and `~/server-setup/srv/proxy/sites/textfix.caddy`.
-
-First deploy: copy `srv/textfix/`, `srv/proxy/compose.yml` and `srv/proxy/sites/textfix.caddy` from `~/server-setup` to the server, then run:
+1. Raise `MARKETING_VERSION` in the Xcode project.
+2. Build the DMG with `app/build-dmg.sh`.
+3. Create the release:
 
 ```sh
-cp /srv/textfix/.env.example /srv/textfix/.env
-chmod 600 /srv/textfix/.env
-docker compose -f /srv/proxy/compose.yml up -d
-systemctl enable --now app-pull@textfix.timer
+gh release create v1.0.0 app/build/TextFix.dmg --title "TextFix 1.0.0" --notes "..."
 ```
 
-Fill in `OPENAI_API_KEY` in `/srv/textfix/.env`.
-Set `APPLE_APP_ID` (the numeric Apple ID from App Store Connect) before the App Store release.
-Without it, the server only accepts Sandbox purchases from TestFlight and App Review.
+The download links always point to the DMG of the latest release.
 
-After that, every push to `main` that changes `server/` or `web/` builds new images, and the pull timer deploys them.
+## Website deploy
 
-## App Store release
+The website runs at [textfix.puteanihollakos.com](https://textfix.puteanihollakos.com).
+Every push to `main` that changes `web/` builds a new image, and the server pulls it within a minute.
+The server config lives in `srv/textfix/compose.yml` and `srv/proxy/sites/textfix.caddy` in the private `server-setup` folder.
 
-1. Create the app in App Store Connect with bundle ID `com.puteanihollakos.textfix`.
-2. Create the subscription group "TextFix Pro" with `com.puteanihollakos.textfix.pro.monthly` ($2.99) and `com.puteanihollakos.textfix.pro.yearly` ($24.99).
-3. Set your team in Xcode (Signing & Capabilities), then Product > Archive and upload.
-4. Privacy URL: `https://textfix.puteanihollakos.com/privacy.html`. Support URL: `https://textfix.puteanihollakos.com/support.html`.
-5. Review notes: TextFix uses Accessibility only to press Copy and Paste for the user after they press a TextFix shortcut.
+## License
+
+[MIT](LICENSE)
+
+Made by [Ákos](https://puteanihollakos.com).

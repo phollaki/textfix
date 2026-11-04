@@ -42,9 +42,6 @@
             ReferencedContainer = "container:TextFix.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <StoreKitConfigurationFileReference
-         identifier = "../../Products.storekit">
-      </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ArchiveAction
       buildConfiguration = "Release"

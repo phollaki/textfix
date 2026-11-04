@@ -1,7 +1,6 @@
 import AppKit
 import ApplicationServices
 import ServiceManagement
-import StoreKit
 import SwiftUI
 
 let languages = [
@@ -12,7 +11,6 @@ let languages = [
 
 @MainActor
 final class SettingsModel: ObservableObject {
-    let store: Store
     private let hotKeys: HotKeys
     private var monitor: Any?
 
@@ -20,21 +18,85 @@ final class SettingsModel: ObservableObject {
     @Published var shortcuts = Dictionary(uniqueKeysWithValues: Mode.allCases.map { ($0, HotKeys.shortcut(for: $0)) })
     @Published var recording: Mode?
     @Published var shortcutError: String?
-    @Published var usage: Usage?
-    @Published var storeError: String?
+    @Published var loginError: String?
     @Published var launchAtLogin = SMAppService.mainApp.status == .enabled
     @Published var language = UserDefaults.standard.string(forKey: "language") ?? "English" {
         didSet { UserDefaults.standard.set(language, forKey: "language") }
     }
+    @Published var provider = UserDefaults.standard.string(forKey: "provider").flatMap(Provider.init(rawValue:)) ?? .openAI {
+        didSet {
+            UserDefaults.standard.set(provider.rawValue, forKey: "provider")
+            apiKey = Keychain.key(for: provider) ?? ""
+            modelName = UserDefaults.standard.string(forKey: "model.\(provider.rawValue)") ?? provider.defaultModel
+            loadModels()
+        }
+    }
+    @Published var apiKey = "" {
+        didSet {
+            let trimmed = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed != apiKey {
+                apiKey = trimmed
+                return
+            }
+            if apiKey != Keychain.key(for: provider) ?? "" { Keychain.set(apiKey, for: provider) }
+            testResult = nil
+        }
+    }
+    @Published var modelName = "" {
+        didSet {
+            UserDefaults.standard.set(modelName, forKey: "model.\(provider.rawValue)")
+            testResult = nil
+        }
+    }
+    @Published var models: [String] = []
+    @Published var testing = false
+    @Published var testResult: (ok: Bool, message: String)?
 
-    init(store: Store, hotKeys: HotKeys) {
-        self.store = store
+    init(hotKeys: HotKeys) {
         self.hotKeys = hotKeys
-        store.onChange = { [weak self] in self?.refreshUsage() }
+        apiKey = Keychain.key(for: provider) ?? ""
+        modelName = UserDefaults.standard.string(forKey: "model.\(provider.rawValue)") ?? provider.defaultModel
     }
 
-    func refreshUsage() {
-        Task { if let usage = await API.usage(transaction: store.transaction) { self.usage = usage } }
+    var ready: Bool { (!provider.needsKey || !apiKey.isEmpty) && !modelName.isEmpty }
+
+    func request(for mode: Mode) -> RewriteRequest? {
+        guard ready else { return nil }
+        return RewriteRequest(mode: mode, language: language, provider: provider, model: modelName, key: apiKey)
+    }
+
+    func loadModels() {
+        models = []
+        guard !provider.needsKey || !apiKey.isEmpty else { return }
+        let provider = provider, key = apiKey
+        Task.detached {
+            let result = AI.models(provider, key: key)
+            await MainActor.run {
+                guard provider == self.provider, case .success(let models) = result else { return }
+                self.models = models
+                if self.modelName.isEmpty, let first = models.first { self.modelName = first }
+            }
+        }
+    }
+
+    func test() {
+        guard let request = request(for: .grammar) else {
+            testResult = (false, provider.needsKey ? "Add your API key first." : "Choose a model first.")
+            return
+        }
+        testing = true
+        testResult = nil
+        Task.detached {
+            let result = AI.rewrite("this sentense have a mistake", request)
+            await MainActor.run {
+                self.testing = false
+                switch result {
+                case .success(let text): self.testResult = (true, "It works: \(text)")
+                case .failure(let error): self.testResult = (false, error.message)
+                }
+            }
+        }
+        loadModels()
     }
 
     func openAccessibilitySettings() {
@@ -85,24 +147,16 @@ final class SettingsModel: ObservableObject {
     func setLaunchAtLogin(_ enabled: Bool) {
         do {
             if enabled { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
+            loginError = nil
         } catch {
-            storeError = error.localizedDescription
+            loginError = error.localizedDescription
         }
         launchAtLogin = SMAppService.mainApp.status == .enabled
-    }
-
-    func buy(_ product: Product) {
-        Task { storeError = await store.buy(product) }
-    }
-
-    func restore() {
-        Task { storeError = await store.restore() }
     }
 }
 
 struct SettingsView: View {
     @ObservedObject var model: SettingsModel
-    @ObservedObject var store: Store
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -134,6 +188,45 @@ struct SettingsView: View {
                 }
             }
 
+            Section("AI provider") {
+                Picker("Provider", selection: $model.provider) {
+                    ForEach(Provider.allCases) { Text($0.title).tag($0) }
+                }
+                if model.provider.needsKey {
+                    SecureField("API key", text: $model.apiKey, prompt: Text("Paste your key"))
+                    if let url = model.provider.keyURL {
+                        Link("Get an API key from \(model.provider.title)", destination: url).font(.caption)
+                    }
+                } else {
+                    Text("Runs on your Mac with Ollama. No key needed. Install it from ollama.com and download a model.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                LabeledContent("Model") {
+                    HStack {
+                        TextField("Model", text: $model.modelName).labelsHidden()
+                        Menu("Choose") {
+                            ForEach(model.models, id: \.self) { name in
+                                Button(name) { model.modelName = name }
+                            }
+                        }
+                        .fixedSize()
+                        .disabled(model.models.isEmpty)
+                    }
+                }
+                HStack {
+                    Button("Test") { model.test() }.disabled(model.testing)
+                    if model.testing { ProgressView().controlSize(.small) }
+                    if let result = model.testResult {
+                        Text(result.message)
+                            .foregroundStyle(result.ok ? .green : .red)
+                            .lineLimit(3)
+                            .textSelection(.enabled)
+                    }
+                }
+                Text("Your key stays in the macOS Keychain. TextFix sends the selected text only to the provider you choose.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+
             Section("Shortcuts") {
                 ForEach(Mode.allCases, id: \.self) { mode in
                     LabeledContent(mode.title) {
@@ -151,48 +244,24 @@ struct SettingsView: View {
                 }
             }
 
-            Section("Plan") {
-                if let usage = model.usage {
-                    LabeledContent(usage.plan == "pro" ? "TextFix Pro" : "Free") {
-                        Text("\(usage.used) of \(usage.limit.formatted()) rewrites this month")
-                    }
-                    ProgressView(value: Double(min(usage.used, usage.limit)), total: Double(usage.limit))
-                }
-                if store.transaction == nil {
-                    ForEach(store.products, id: \.id) { product in
-                        Button("\(product.displayName): \(product.displayPrice) \(period(product))") { model.buy(product) }
-                    }
-                    Text("Pro gives you 2,000 rewrites a month. The subscription renews automatically until you cancel it in your App Store settings.")
-                        .font(.caption).foregroundStyle(.secondary)
-                } else {
-                    Link("Manage subscription", destination: URL(string: "https://apps.apple.com/account/subscriptions")!)
-                }
-                Button("Restore purchases") { model.restore() }
-                if let error = model.storeError {
-                    Text(error).foregroundStyle(.red)
-                }
-            }
-
             Section {
                 Toggle("Open TextFix at login", isOn: Binding(get: { model.launchAtLogin }, set: { model.setLaunchAtLogin($0) }))
+                if let error = model.loginError {
+                    Text(error).foregroundStyle(.red)
+                }
                 HStack(spacing: 16) {
-                    Link("Privacy", destination: API.website.appendingPathComponent("privacy.html"))
-                    Link("Terms", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
-                    Link("Support", destination: API.website.appendingPathComponent("support.html"))
+                    Link("Website", destination: URL(string: "https://textfix.puteanihollakos.com")!)
+                    Link("Source code", destination: URL(string: "https://github.com/phollaki/textfix")!)
+                    Link("Report a problem", destination: URL(string: "https://github.com/phollaki/textfix/issues")!)
                 }
                 .font(.caption)
-                Text("Your ID: \(API.installId)")
-                    .font(.caption).foregroundStyle(.secondary).textSelection(.enabled)
             }
         }
         .formStyle(.grouped)
         .frame(minWidth: 440, idealWidth: 480, minHeight: 360, idealHeight: 620)
+        .onAppear { model.loadModels() }
         .onReceive(timer) { _ in model.trusted = AXIsProcessTrusted() }
         .onDisappear { model.stopRecording() }
-    }
-
-    private func period(_ product: Product) -> String {
-        product.subscription?.subscriptionPeriod.unit == .year ? "a year" : "a month"
     }
 }
 
@@ -216,12 +285,11 @@ final class SettingsWindow: NSObject, NSWindowDelegate {
             window.title = "TextFix"
             window.isReleasedWhenClosed = false
             window.delegate = self
-            window.contentView = NSHostingView(rootView: SettingsView(model: model, store: model.store))
+            window.contentView = NSHostingView(rootView: SettingsView(model: model))
             window.setContentSize(NSSize(width: 480, height: min(620, (NSScreen.main?.visibleFrame.height ?? 700) - 80)))
             window.center()
             self.window = window
         }
-        model.refreshUsage()
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
         window?.makeKeyAndOrderFront(nil)

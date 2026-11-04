@@ -4,26 +4,102 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>TextFix - Fix any text on your Mac with one shortcut</title>
-    <meta name="description" content="Select text in any Mac app and press a shortcut. TextFix rephrases it, fixes the grammar or translates it, right where you type." />
+    <meta name="description" content="Select text in any Mac app and press a shortcut. TextFix rephrases it, fixes the grammar or translates it, right where you type. Free and open source." />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="stylesheet" href="styles.css" />
+    <script>document.documentElement.classList.add("js");</script>
   </head>
   <body>
-    <div class="wrap">
-      <header>
-        <a class="brand" href="/"><img src="icon.png" alt="" />TextFix</a>
-        <a class="button small" href="#download">Download</a>
-      </header>
+    <header class="topbar">
+      <nav class="links">
+        <a href="#how">How it works</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <a class="brand" href="/"><img src="icon.png" alt="" />TextFix</a>
+      <div class="actions">
+        <a class="ghost" href="https://github.com/phollaki/textfix">GitHub</a>
+        <a class="button small" href="https://github.com/phollaki/textfix/releases/latest/download/TextFix.dmg">Download</a>
+      </div>
+    </header>
 
-      <main>
-        <div class="hero">
-          <div>
-            <h1>Better text in <span>every app</span>. One shortcut.</h1>
-            <p>Select text anywhere on your Mac and press a shortcut. TextFix rephrases it, fixes the grammar or translates it, right where you type.</p>
-            <a class="button" id="download" href="https://apps.apple.com/app/textfix">Download on the Mac App Store</a>
-            <div class="note">Free to try. 30 rewrites a month, no account needed. macOS 14 or later.</div>
+    <main>
+      <div class="hero" id="hero">
+        <div class="floaters" aria-hidden="true">
+          <div class="floater" style="--x: 3%; --y: 6%; --r: -4deg; --d: 0.1s; --depth: 18">
+            <div class="mini">
+              <div class="app"><b style="--c: #3b82f6">M</b>Mail</div>
+              <s>i has went home erly</s>
+              <p>I went home early.</p>
+              <span class="keys-sm"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>G</kbd></span>
+            </div>
           </div>
+          <div class="floater" style="--x: 8%; --y: 40%; --r: 3deg; --d: 0.3s; --depth: 30">
+            <div class="mini">
+              <div class="app"><b style="--c: #e11d74">S</b>Slack</div>
+              <s>Per my last message, kindly revert.</s>
+              <p>Quick reminder, can you reply?</p>
+              <span class="keys-sm"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>R</kbd></span>
+            </div>
+          </div>
+          <div class="floater" style="--x: 2%; --y: 72%; --r: -2deg; --d: 0.5s; --depth: 12">
+            <div class="mini">
+              <div class="app"><b style="--c: #f59e0b">N</b>Notes</div>
+              <s>Jó reggelt mindenkinek!</s>
+              <p>Good morning, everyone!</p>
+              <span class="keys-sm"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>T</kbd></span>
+            </div>
+          </div>
+          <div class="floater right" style="--x: 4%; --y: 4%; --r: 4deg; --d: 0.2s; --depth: 24">
+            <div class="mini">
+              <div class="app"><b style="--c: #6366f1">T</b>Teams</div>
+              <s>Danke für deine Hilfe heute.</s>
+              <p>Thanks for your help today.</p>
+              <span class="keys-sm"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>T</kbd></span>
+            </div>
+          </div>
+          <div class="floater right" style="--x: 1%; --y: 38%; --r: -3deg; --d: 0.4s; --depth: 14">
+            <div class="mini">
+              <div class="app"><b style="--c: #0ea5e9">B</b>Browser</div>
+              <s>their running abit late</s>
+              <p>They're running a bit late.</p>
+              <span class="keys-sm"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>G</kbd></span>
+            </div>
+          </div>
+          <div class="floater right" style="--x: 7%; --y: 70%; --r: 2deg; --d: 0.6s; --depth: 28">
+            <div class="mini">
+              <div class="app"><b style="--c: #10b981">P</b>Pages</div>
+              <s>We will leverage our synergies.</s>
+              <p>We will work together.</p>
+              <span class="keys-sm"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>R</kbd></span>
+            </div>
+          </div>
+        </div>
 
+        <div class="hero-copy">
+          <div class="tag rise" style="--d: 0s"><span class="sparkle">✦</span> Free and open source</div>
+          <h1>
+            <span class="rise" style="--d: 0.08s">Fix your text</span>
+            <span class="rise" style="--d: 0.18s">in <em>every app</em></span>
+          </h1>
+          <p class="rise" style="--d: 0.28s">Select text, press a shortcut. TextFix rephrases it, fixes the grammar or translates it, right where you type.</p>
+          <div class="rise" style="--d: 0.38s">
+            <a class="button big" id="download" href="https://github.com/phollaki/textfix/releases/latest/download/TextFix.dmg">Download for Mac</a>
+          </div>
+          <div class="small rise" style="--d: 0.46s">Free forever. Bring your own key from OpenAI, Claude, Gemini and more. macOS 14 or later.</div>
+        </div>
+      </div>
+
+      <div class="marquee" aria-label="Translates to 24 languages">
+        <div class="track">
+          <span>English</span><span>Deutsch</span><span>Magyar</span><span>Français</span><span>Español</span><span>Italiano</span><span>Português</span><span>Nederlands</span><span>Polski</span><span>Čeština</span><span>Slovenčina</span><span>Română</span><span>Hrvatski</span><span>Svenska</span><span>Dansk</span><span>Norsk</span><span>Suomi</span><span>Ελληνικά</span><span>Türkçe</span><span>Українська</span><span>Русский</span><span>日本語</span><span>한국어</span><span>中文</span>
+          <span aria-hidden="true">English</span><span aria-hidden="true">Deutsch</span><span aria-hidden="true">Magyar</span><span aria-hidden="true">Français</span><span aria-hidden="true">Español</span><span aria-hidden="true">Italiano</span><span aria-hidden="true">Português</span><span aria-hidden="true">Nederlands</span><span aria-hidden="true">Polski</span><span aria-hidden="true">Čeština</span><span aria-hidden="true">Slovenčina</span><span aria-hidden="true">Română</span><span aria-hidden="true">Hrvatski</span><span aria-hidden="true">Svenska</span><span aria-hidden="true">Dansk</span><span aria-hidden="true">Norsk</span><span aria-hidden="true">Suomi</span><span aria-hidden="true">Ελληνικά</span><span aria-hidden="true">Türkçe</span><span aria-hidden="true">Українська</span><span aria-hidden="true">Русский</span><span aria-hidden="true">日本語</span><span aria-hidden="true">한국어</span><span aria-hidden="true">中文</span>
+        </div>
+      </div>
+
+      <div class="wrap">
+        <section class="reveal">
+          <h2>See it in action</h2>
+          <p class="lead">No copy and paste between windows. The new text replaces the old one.</p>
           <div class="demo" aria-label="TextFix demo">
             <div class="dots"><i></i><i></i><i></i></div>
             <div class="demo-text" id="demo-text"></div>
@@ -32,25 +108,25 @@
               <div class="pill" id="demo-pill"><span class="spinner"></span><span id="demo-label">Fixing grammar…</span></div>
             </div>
           </div>
-        </div>
+        </section>
 
         <section>
-          <h2>Three shortcuts. That's it.</h2>
-          <p class="lead">Works in Mail, Slack, Teams, Notes, your browser and every other app where you can select text.</p>
+          <h2 class="reveal">Three shortcuts. That's it.</h2>
+          <p class="lead reveal">Works in Mail, Slack, Teams, Notes, your browser and every other app where you can select text.</p>
           <div class="grid">
-            <div class="card">
+            <div class="card reveal" style="--d: 0s">
               <div class="icon">Aa</div>
               <h3>Rephrase</h3>
               <p>Turns stiff or clumsy text into plain, natural sentences. Keeps your meaning and every fact.</p>
               <p class="note"><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>R</kbd></p>
             </div>
-            <div class="card">
+            <div class="card reveal" style="--d: 0.1s">
               <div class="icon">✓</div>
               <h3>Fix grammar</h3>
               <p>Fixes spelling, grammar and punctuation. Nothing else. Your words and your style stay.</p>
               <p class="note"><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>G</kbd></p>
             </div>
-            <div class="card">
+            <div class="card reveal" style="--d: 0.2s">
               <div class="icon">文</div>
               <h3>Translate</h3>
               <p>Translates the selection into the language you pick. 24 languages, faithful and correct.</p>
@@ -59,103 +135,128 @@
           </div>
         </section>
 
-        <section>
-          <h2>Ready in a minute</h2>
-          <p class="lead">No account, no browser extension, no copy and paste between windows.</p>
+        <section id="how">
+          <h2 class="reveal">Ready in a minute</h2>
+          <p class="lead reveal">No account and no browser extension.</p>
           <div class="grid steps">
-            <div class="card">
+            <div class="card reveal" style="--d: 0s">
               <h3>Install</h3>
-              <p>Download TextFix from the Mac App Store. It lives in your menu bar.</p>
+              <p>Open the DMG and drag TextFix to Applications. It lives in your menu bar. See <a href="#first-open">the first open</a>.</p>
             </div>
-            <div class="card">
-              <h3>Allow access</h3>
-              <p>One button opens the right place in System Settings. TextFix needs it to copy and paste your selection.</p>
+            <div class="card reveal" style="--d: 0.1s">
+              <h3>Allow and add your key</h3>
+              <p>One button opens the right place in System Settings. Then pick your AI provider, paste your key and press Test.</p>
             </div>
-            <div class="card">
+            <div class="card reveal" style="--d: 0.2s">
               <h3>Select and press</h3>
-              <p>Select text, press a shortcut, and the new text replaces the old one. You can change the shortcuts any time.</p>
+              <p>Select text, press a shortcut, done. You can change the shortcuts any time.</p>
             </div>
           </div>
-        </section>
-
-        <section id="pricing">
-          <h2>Simple pricing</h2>
-          <p class="lead">Start free. Upgrade when TextFix becomes part of your day.</p>
-          <div class="grid plans">
-            <div class="card plan">
-              <h3>Free</h3>
-              <div class="price">$0</div>
-              <ul>
-                <li>30 rewrites a month</li>
-                <li>All three shortcuts</li>
-                <li>24 languages</li>
-              </ul>
-            </div>
-            <div class="card plan featured">
-              <span class="badge">Most popular</span>
-              <h3>Pro Monthly</h3>
-              <div class="price">$2.99 <small>/ month</small></div>
-              <ul>
-                <li>2,000 rewrites a month</li>
-                <li>Use it on all your Macs</li>
-                <li>Cancel any time</li>
-              </ul>
-            </div>
-            <div class="card plan">
-              <h3>Pro Yearly</h3>
-              <div class="price">$24.99 <small>/ year</small></div>
-              <ul>
-                <li>2,000 rewrites a month</li>
-                <li>Two months free</li>
-                <li>Cancel any time</li>
-              </ul>
-            </div>
-          </div>
-          <p class="note" style="text-align: center">Prices in USD. Your local App Store price may differ and includes VAT.</p>
         </section>
 
         <section>
-          <h2>Questions</h2>
-          <details>
+          <h2 class="reveal">Pick your AI</h2>
+          <p class="lead reveal">Use the provider and the model you like. Switch any time in the settings.</p>
+          <div class="providers reveal">
+            <span>OpenAI</span><span>Anthropic Claude</span><span>Google Gemini</span><span>Mistral</span><span>Groq</span><span>OpenRouter</span><span>Ollama on your Mac</span>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="reveal">Free. Yours. Open.</h2>
+          <p class="lead reveal">No subscription and no middleman.</p>
+          <div class="grid">
+            <div class="card reveal" style="--d: 0s">
+              <div class="icon">0</div>
+              <h3>Free forever</h3>
+              <p>You only pay your AI provider for what you use. A typical rewrite costs a tiny fraction of a cent. With Ollama it costs nothing.</p>
+            </div>
+            <div class="card reveal" style="--d: 0.1s">
+              <div class="icon">⚿</div>
+              <h3>Your key, your text</h3>
+              <p>Your text goes straight from your Mac to the provider you pick. Your key stays in the macOS Keychain.</p>
+            </div>
+            <div class="card reveal" style="--d: 0.2s">
+              <div class="icon">{ }</div>
+              <h3>Open source</h3>
+              <p>Read every line on GitHub. Change it, build it yourself, or send a fix.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="faq">
+          <h2 class="reveal">Questions</h2>
+          <details class="reveal">
             <summary>Do you store my text?</summary>
-            <p>No. Your text goes to our server and to OpenAI only to create the new version. We don't save it and we don't log it. We only count how many rewrites you use each month. Read the <a href="privacy.html">privacy policy</a>.</p>
+            <p>No. There is no TextFix server. Your Mac sends the text directly to the AI provider you pick, with your own key.</p>
           </details>
-          <details>
+          <details class="reveal">
+            <summary>Where do I get an API key?</summary>
+            <p>From your provider's website, for example <a href="https://platform.openai.com/api-keys">OpenAI</a>, <a href="https://console.anthropic.com/settings/keys">Anthropic</a> or <a href="https://aistudio.google.com/apikey">Google AI Studio</a>. Add a few dollars of credit, then paste the key into the TextFix settings. The settings have a direct link for every provider.</p>
+          </details>
+          <details class="reveal">
+            <summary>Can I use it without the cloud?</summary>
+            <p>Yes. Install <a href="https://ollama.com">Ollama</a>, download a model, and choose "Ollama (on this Mac)" in the settings. Your text never leaves your Mac.</p>
+          </details>
+          <details class="reveal" id="first-open">
+            <summary>macOS says it cannot check TextFix for malware</summary>
+            <p>TextFix is not notarized by Apple yet. Close the message, open System Settings, go to Privacy &amp; Security, scroll down and click "Open Anyway" next to TextFix. You only do this once. You can also read and build the <a href="https://github.com/phollaki/textfix">source code</a> yourself.</p>
+          </details>
+          <details class="reveal">
             <summary>Why does TextFix need Accessibility access?</summary>
             <p>TextFix presses Copy and Paste for you. macOS only allows this for apps with Accessibility access. TextFix does nothing until you press one of its shortcuts.</p>
           </details>
-          <details>
+          <details class="reveal">
             <summary>Which apps does it work in?</summary>
             <p>In every app where you can select text and use Copy and Paste: Mail, Slack, Teams, Notes, Pages, Word, Safari, Chrome and more.</p>
           </details>
-          <details>
-            <summary>How long can the text be?</summary>
-            <p>Up to 4,000 characters at a time. That's about a page and a half.</p>
-          </details>
-          <details>
-            <summary>How do I cancel Pro?</summary>
-            <p>Pro is an App Store subscription. Cancel it any time in the App Store under your account settings, or with "Manage subscription" in TextFix.</p>
-          </details>
         </section>
 
-        <div class="cta">
+        <div class="cta reveal">
           <h2>Write better in every app</h2>
-          <p>Free to try. No account needed.</p>
-          <a class="button" href="https://apps.apple.com/app/textfix">Download on the Mac App Store</a>
+          <p>Free and open source. No account needed.</p>
+          <a class="button" href="https://github.com/phollaki/textfix/releases/latest/download/TextFix.dmg">Download for Mac</a>
         </div>
-      </main>
+      </div>
+    </main>
 
+    <div class="wrap">
       <footer>
-        <span>© 2026 TextFix</span>
+        <span>Made by <a href="https://puteanihollakos.com">Ákos</a></span>
         <nav>
+          <a href="https://github.com/phollaki/textfix">GitHub</a>
           <a href="privacy.html">Privacy</a>
           <a href="support.html">Support</a>
-          <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/">Terms</a>
         </nav>
       </footer>
     </div>
 
     <script>
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const revealed = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in");
+            revealed.unobserve(entry.target);
+          }
+        }
+      }, { threshold: 0.15 });
+      document.querySelectorAll(".reveal").forEach((element) => revealed.observe(element));
+
+      const hero = document.getElementById("hero");
+      if (!reduced) {
+        hero.addEventListener("pointermove", (event) => {
+          const box = hero.getBoundingClientRect();
+          hero.style.setProperty("--mx", ((event.clientX - box.left) / box.width - 0.5).toFixed(3));
+          hero.style.setProperty("--my", ((event.clientY - box.top) / box.height - 0.5).toFixed(3));
+        });
+        hero.addEventListener("pointerleave", () => {
+          hero.style.setProperty("--mx", 0);
+          hero.style.setProperty("--my", 0);
+        });
+      }
+
       const examples = [
         { key: "G", label: "Fixing grammar…", before: "i has went to the store yesterday and buyed some milk, it were cold.", after: "I went to the store yesterday and bought some milk. It was cold." },
         { key: "R", label: "Rephrasing…", before: "Please be advised that the meeting has been postponed to a later date to be determined.", after: "Heads up: we moved the meeting. We'll share the new date soon." },
@@ -168,13 +269,21 @@
       const label = document.getElementById("demo-label");
       const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+      const type = async (value) => {
+        text.textContent = "";
+        for (const char of value) {
+          text.textContent += char;
+          await wait(18);
+        }
+      };
+
       const play = async () => {
         for (let i = 0; ; i = (i + 1) % examples.length) {
           const example = examples[i];
           key.textContent = example.key;
           label.textContent = example.label;
-          text.textContent = example.before;
-          await wait(1400);
+          await type(example.before);
+          await wait(900);
           text.innerHTML = "";
           const mark = document.createElement("mark");
           mark.textContent = example.before;
@@ -186,12 +295,16 @@
           pill.classList.add("visible");
           await wait(1300);
           pill.classList.remove("visible");
-          text.textContent = example.after;
+          text.innerHTML = "";
+          const result = document.createElement("span");
+          result.className = "fresh";
+          result.textContent = example.after;
+          text.append(result);
           await wait(3200);
         }
       };
 
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      if (reduced) {
         text.textContent = examples[0].after;
       } else {
         play();

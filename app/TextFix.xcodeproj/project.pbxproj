@@ -9,7 +9,6 @@
 /* Begin PBXFileReference section */
 		A10000000000000000000001 /* TextFix.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TextFix.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000002 /* TextFix.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TextFix.entitlements; sourceTree = "<group>"; };
-		A10000000000000000000003 /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Products.storekit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -32,7 +31,6 @@
 			children = (
 				A10000000000000000000010 /* TextFix */,
 				A10000000000000000000002 /* TextFix.entitlements */,
-				A10000000000000000000003 /* Products.storekit */,
 				A10000000000000000000031 /* Products */,
 			);
 			sourceTree = "<group>";
