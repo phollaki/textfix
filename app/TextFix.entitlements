@@ -2,13 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>Label</key>
-	<string>com.akos.textfix</string>
-	<key>ProgramArguments</key>
-	<array>
-		<string>/Applications/TextFix.app/Contents/MacOS/TextFix</string>
-	</array>
-	<key>RunAtLoad</key>
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<key>com.apple.security.network.client</key>
 	<true/>
 </dict>
 </plist>

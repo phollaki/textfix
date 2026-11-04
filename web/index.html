@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TextFix - Fix any text on your Mac with one shortcut</title>
+    <meta name="description" content="Select text in any Mac app and press a shortcut. TextFix rephrases it, fixes the grammar or translates it, right where you type." />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <a class="brand" href="/"><img src="icon.png" alt="" />TextFix</a>
+        <a class="button small" href="#download">Download</a>
+      </header>
+
+      <main>
+        <div class="hero">
+          <div>
+            <h1>Better text in <span>every app</span>. One shortcut.</h1>
+            <p>Select text anywhere on your Mac and press a shortcut. TextFix rephrases it, fixes the grammar or translates it, right where you type.</p>
+            <a class="button" id="download" href="https://apps.apple.com/app/textfix">Download on the Mac App Store</a>
+            <div class="note">Free to try. 30 rewrites a month, no account needed. macOS 14 or later.</div>
+          </div>
+
+          <div class="demo" aria-label="TextFix demo">
+            <div class="dots"><i></i><i></i><i></i></div>
+            <div class="demo-text" id="demo-text"></div>
+            <div class="demo-bar">
+              <div class="keys" id="demo-keys"><kbd>⌃</kbd><kbd>⌥</kbd><kbd id="demo-key">G</kbd></div>
+              <div class="pill" id="demo-pill"><span class="spinner"></span><span id="demo-label">Fixing grammar…</span></div>
+            </div>
+          </div>
+        </div>
+
+        <section>
+          <h2>Three shortcuts. That's it.</h2>
+          <p class="lead">Works in Mail, Slack, Teams, Notes, your browser and every other app where you can select text.</p>
+          <div class="grid">
+            <div class="card">
+              <div class="icon">Aa</div>
+              <h3>Rephrase</h3>
+              <p>Turns stiff or clumsy text into plain, natural sentences. Keeps your meaning and every fact.</p>
+              <p class="note"><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>R</kbd></p>
+            </div>
+            <div class="card">
+              <div class="icon">✓</div>
+              <h3>Fix grammar</h3>
+              <p>Fixes spelling, grammar and punctuation. Nothing else. Your words and your style stay.</p>
+              <p class="note"><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>G</kbd></p>
+            </div>
+            <div class="card">
+              <div class="icon">文</div>
+              <h3>Translate</h3>
+              <p>Translates the selection into the language you pick. 24 languages, faithful and correct.</p>
+              <p class="note"><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>T</kbd></p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>Ready in a minute</h2>
+          <p class="lead">No account, no browser extension, no copy and paste between windows.</p>
+          <div class="grid steps">
+            <div class="card">
+              <h3>Install</h3>
+              <p>Download TextFix from the Mac App Store. It lives in your menu bar.</p>
+            </div>
+            <div class="card">
+              <h3>Allow access</h3>
+              <p>One button opens the right place in System Settings. TextFix needs it to copy and paste your selection.</p>
+            </div>
+            <div class="card">
+              <h3>Select and press</h3>
+              <p>Select text, press a shortcut, and the new text replaces the old one. You can change the shortcuts any time.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="pricing">
+          <h2>Simple pricing</h2>
+          <p class="lead">Start free. Upgrade when TextFix becomes part of your day.</p>
+          <div class="grid plans">
+            <div class="card plan">
+              <h3>Free</h3>
+              <div class="price">$0</div>
+              <ul>
+                <li>30 rewrites a month</li>
+                <li>All three shortcuts</li>
+                <li>24 languages</li>
+              </ul>
+            </div>
+            <div class="card plan featured">
+              <span class="badge">Most popular</span>
+              <h3>Pro Monthly</h3>
+              <div class="price">$2.99 <small>/ month</small></div>
+              <ul>
+                <li>2,000 rewrites a month</li>
+                <li>Use it on all your Macs</li>
+                <li>Cancel any time</li>
+              </ul>
+            </div>
+            <div class="card plan">
+              <h3>Pro Yearly</h3>
+              <div class="price">$24.99 <small>/ year</small></div>
+              <ul>
+                <li>2,000 rewrites a month</li>
+                <li>Two months free</li>
+                <li>Cancel any time</li>
+              </ul>
+            </div>
+          </div>
+          <p class="note" style="text-align: center">Prices in USD. Your local App Store price may differ and includes VAT.</p>
+        </section>
+
+        <section>
+          <h2>Questions</h2>
+          <details>
+            <summary>Do you store my text?</summary>
+            <p>No. Your text goes to our server and to OpenAI only to create the new version. We don't save it and we don't log it. We only count how many rewrites you use each month. Read the <a href="privacy.html">privacy policy</a>.</p>
+          </details>
+          <details>
+            <summary>Why does TextFix need Accessibility access?</summary>
+            <p>TextFix presses Copy and Paste for you. macOS only allows this for apps with Accessibility access. TextFix does nothing until you press one of its shortcuts.</p>
+          </details>
+          <details>
+            <summary>Which apps does it work in?</summary>
+            <p>In every app where you can select text and use Copy and Paste: Mail, Slack, Teams, Notes, Pages, Word, Safari, Chrome and more.</p>
+          </details>
+          <details>
+            <summary>How long can the text be?</summary>
+            <p>Up to 4,000 characters at a time. That's about a page and a half.</p>
+          </details>
+          <details>
+            <summary>How do I cancel Pro?</summary>
+            <p>Pro is an App Store subscription. Cancel it any time in the App Store under your account settings, or with "Manage subscription" in TextFix.</p>
+          </details>
+        </section>
+
+        <div class="cta">
+          <h2>Write better in every app</h2>
+          <p>Free to try. No account needed.</p>
+          <a class="button" href="https://apps.apple.com/app/textfix">Download on the Mac App Store</a>
+        </div>
+      </main>
+
+      <footer>
+        <span>© 2026 TextFix</span>
+        <nav>
+          <a href="privacy.html">Privacy</a>
+          <a href="support.html">Support</a>
+          <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/">Terms</a>
+        </nav>
+      </footer>
+    </div>
+
+    <script>
+      const examples = [
+        { key: "G", label: "Fixing grammar…", before: "i has went to the store yesterday and buyed some milk, it were cold.", after: "I went to the store yesterday and bought some milk. It was cold." },
+        { key: "R", label: "Rephrasing…", before: "Please be advised that the meeting has been postponed to a later date to be determined.", after: "Heads up: we moved the meeting. We'll share the new date soon." },
+        { key: "T", label: "Translating…", before: "Holnap reggel korán kelek, mert a tárgyalás kilenckor kezdődik.", after: "I'm getting up early tomorrow because the meeting starts at nine." },
+      ];
+      const text = document.getElementById("demo-text");
+      const keys = document.getElementById("demo-keys");
+      const key = document.getElementById("demo-key");
+      const pill = document.getElementById("demo-pill");
+      const label = document.getElementById("demo-label");
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      const play = async () => {
+        for (let i = 0; ; i = (i + 1) % examples.length) {
+          const example = examples[i];
+          key.textContent = example.key;
+          label.textContent = example.label;
+          text.textContent = example.before;
+          await wait(1400);
+          text.innerHTML = "";
+          const mark = document.createElement("mark");
+          mark.textContent = example.before;
+          text.append(mark);
+          await wait(800);
+          keys.classList.add("pressed");
+          await wait(250);
+          keys.classList.remove("pressed");
+          pill.classList.add("visible");
+          await wait(1300);
+          pill.classList.remove("visible");
+          text.textContent = example.after;
+          await wait(3200);
+        }
+      };
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        text.textContent = examples[0].after;
+      } else {
+        play();
+      }
+    </script>
+  </body>
+</html>

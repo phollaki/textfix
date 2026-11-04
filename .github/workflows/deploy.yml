@@ -1,0 +1,79 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths: ["server/**", "web/**", ".github/workflows/deploy.yml"]
+  pull_request:
+    paths: ["server/**", "web/**", ".github/workflows/deploy.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: textfix-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  API_IMAGE: ghcr.io/phollaki/textfix/api
+  WEB_IMAGE: ghcr.io/phollaki/textfix/web
+  SITE_URL: https://textfix.puteanihollakos.com
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Test server
+        working-directory: server
+        run: |
+          npm ci
+          npm run typecheck
+          npm test
+
+      - name: Build images
+        run: |
+          printf '%s\n' "$GITHUB_SHA" > web/version.txt
+          for part in api:server web:web; do
+            image="ghcr.io/phollaki/textfix/${part%%:*}"
+            docker build \
+              --label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
+              --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+              --tag "$image:production" --tag "$image:$GITHUB_SHA" "${part##*:}"
+          done
+
+      - name: Publish images
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '%s\n' "$REGISTRY_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          for image in "$API_IMAGE" "$WEB_IMAGE"; do
+            docker push "$image:$GITHUB_SHA"
+            docker push "$image:production"
+          done
+
+      - name: Wait for the server to deploy this version
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.WAIT_FOR_DEPLOY == 'true'
+        run: |
+          for attempt in $(seq 1 40); do
+            if curl --fail --silent --max-time 10 "$SITE_URL/version.txt" | grep -qx "$GITHUB_SHA"; then
+              echo "Live: $GITHUB_SHA"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "The server did not deploy $GITHUB_SHA in time" >&2
+          exit 1

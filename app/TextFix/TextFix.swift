@@ -2,7 +2,7 @@ import AppKit
 import ApplicationServices
 import Carbon
 
-enum Mode: UInt32 {
+enum Mode: UInt32, CaseIterable {
     case rephrase = 1
     case grammar = 2
     case translate = 3
@@ -15,11 +15,28 @@ enum Mode: UInt32 {
         }
     }
 
+    var title: String {
+        switch self {
+        case .rephrase: return "Rephrase"
+        case .grammar: return "Fix grammar"
+        case .translate: return "Translate"
+        }
+    }
+
     var loadingTitle: String {
         switch self {
         case .rephrase: return "Rephrasing…"
         case .grammar: return "Fixing grammar…"
         case .translate: return "Translating…"
+        }
+    }
+
+    var defaultShortcut: Shortcut {
+        let modifiers = UInt32(controlKey | optionKey)
+        switch self {
+        case .rephrase: return Shortcut(keyCode: UInt32(kVK_ANSI_R), modifiers: modifiers, key: "R")
+        case .grammar: return Shortcut(keyCode: UInt32(kVK_ANSI_G), modifiers: modifiers, key: "G")
+        case .translate: return Shortcut(keyCode: UInt32(kVK_ANSI_T), modifiers: modifiers, key: "T")
         }
     }
 }
@@ -77,105 +94,95 @@ final class LoadingPanel {
     }
 }
 
-final class TextFix: NSObject {
+final class TextFix: NSObject, NSApplicationDelegate, @unchecked Sendable {
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let pasteboard = NSPasteboard.general
-    private let script = NSHomeDirectory() + "/.local/bin/textfix"
     private let loading = LoadingPanel()
+    private let hotKeys = HotKeys()
+    private var settings: SettingsWindow?
     private var busy = false
 
+    @MainActor
     func start() {
+        let store = Store()
+        store.start()
+        let model = SettingsModel(store: store, hotKeys: hotKeys)
+        settings = SettingsWindow(model: model)
+
         statusItem.button?.title = "✎"
         let menu = NSMenu()
-        menu.addItem(withTitle: "Rephrase: Control+Option+R", action: nil, keyEquivalent: "")
-        menu.addItem(withTitle: "Fix grammar: Control+Option+G", action: nil, keyEquivalent: "")
-        menu.addItem(withTitle: "Translate to English: Control+Option+T", action: nil, keyEquivalent: "")
+        let item = menu.addItem(withTitle: "Settings…", action: #selector(openSettings), keyEquivalent: ",")
+        item.target = self
         menu.addItem(.separator())
-        menu.addItem(withTitle: "Quit TextFix", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "")
+        menu.addItem(withTitle: "Quit TextFix", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         statusItem.menu = menu
 
+        hotKeys.registerAll()
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
-        _ = AXIsProcessTrustedWithOptions(options)
+        if !AXIsProcessTrustedWithOptions(options) { settings?.show() }
     }
 
+    @MainActor @objc private func openSettings() {
+        settings?.show()
+    }
+
+    @MainActor
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        settings?.show()
+        return false
+    }
+
+    @MainActor
     func run(_ mode: Mode) {
         guard !busy else { return }
         guard AXIsProcessTrusted() else {
-            show("TextFix needs Accessibility access. Turn it on in System Settings > Privacy & Security > Accessibility.")
+            settings?.show()
             return
         }
+        guard let model = settings?.model else { return }
         busy = true
         statusItem.button?.title = "…"
         loading.show(mode.loadingTitle)
         let app = NSWorkspace.shared.frontmostApplication
+        let request = RewriteRequest(mode: mode, language: model.language, transaction: model.store.transaction)
 
         DispatchQueue.global(qos: .userInitiated).async {
             self.waitForModifierRelease()
             let saved = self.savePasteboard()
-            let error = self.process(mode, app: app, saved: saved)
-            DispatchQueue.main.async {
+            let (error, usage) = self.process(request, app: app, saved: saved)
+            Task { @MainActor in
                 self.busy = false
                 self.loading.hide()
                 self.statusItem.button?.title = "✎"
+                if let usage { model.usage = usage }
                 if let error { self.show(error) }
             }
         }
     }
 
-    private func process(_ mode: Mode, app: NSRunningApplication?, saved: [NSPasteboardItem]) -> String? {
+    private func process(_ request: RewriteRequest, app: NSRunningApplication?, saved: [NSPasteboardItem]) -> (String?, Usage?) {
         let count = pasteboard.changeCount
         press(key: 8)
         guard waitForCopy(after: count), let text = pasteboard.string(forType: .string) else {
             NSSound.beep()
-            return nil
+            return (nil, nil)
         }
 
-        let result = rewrite(text, mode)
-        switch result {
+        switch API.rewrite(text, request) {
         case .failure(let error):
             restore(saved)
-            return error.message
-        case .success(let output):
+            return (error.message, error.usage)
+        case .success(let (output, usage)):
             pasteboard.clearContents()
             pasteboard.setString(output, forType: .string)
             guard NSWorkspace.shared.frontmostApplication?.processIdentifier == app?.processIdentifier else {
-                return "You switched apps, so TextFix did not paste. The new text is in your clipboard."
+                return ("You switched apps, so TextFix did not paste. The new text is in your clipboard.", usage)
             }
             press(key: 9)
             Thread.sleep(forTimeInterval: 1)
             restore(saved)
-            return nil
+            return (nil, usage)
         }
-    }
-
-    private func rewrite(_ text: String, _ mode: Mode) -> Result<String, ScriptError> {
-        let task = Process()
-        let input = Pipe()
-        let output = Pipe()
-        let errors = Pipe()
-        task.executableURL = URL(fileURLWithPath: script)
-        task.arguments = [mode.argument]
-        task.standardInput = input
-        task.standardOutput = output
-        task.standardError = errors
-
-        do {
-            try task.run()
-        } catch {
-            return .failure(ScriptError(message: "Could not start \(script)"))
-        }
-
-        try? input.fileHandleForWriting.write(contentsOf: Data(text.utf8))
-        try? input.fileHandleForWriting.close()
-        let data = output.fileHandleForReading.readDataToEndOfFile()
-        let errorData = errors.fileHandleForReading.readDataToEndOfFile()
-        task.waitUntilExit()
-
-        guard task.terminationStatus == 0, let result = String(data: data, encoding: .utf8) else {
-            let message = String(data: errorData, encoding: .utf8) ?? ""
-            return .failure(ScriptError(message: message.isEmpty ? "TextFix failed" : message))
-        }
-        return .success(result)
     }
 
     private func press(key: CGKeyCode) {
@@ -198,7 +205,7 @@ final class TextFix: NSObject {
     private func waitForModifierRelease() {
         for _ in 0..<100 {
             let flags = CGEventSource.flagsState(.combinedSessionState)
-            if !flags.contains(.maskControl) && !flags.contains(.maskAlternate) { return }
+            if flags.intersection([.maskControl, .maskAlternate, .maskShift, .maskCommand]).isEmpty { return }
             Thread.sleep(forTimeInterval: 0.01)
         }
     }
@@ -226,33 +233,3 @@ final class TextFix: NSObject {
         alert.runModal()
     }
 }
-
-struct ScriptError: Error {
-    let message: String
-}
-
-let textFix = TextFix()
-
-func register(key: Int, mode: Mode) {
-    var reference: EventHotKeyRef?
-    let id = EventHotKeyID(signature: OSType(0x5446_5854), id: mode.rawValue)
-    RegisterEventHotKey(UInt32(key), UInt32(controlKey | optionKey), id, GetApplicationEventTarget(), 0, &reference)
-}
-
-signal(SIGPIPE, SIG_IGN)
-let app = NSApplication.shared
-app.setActivationPolicy(.accessory)
-textFix.start()
-
-var eventType = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
-InstallEventHandler(GetApplicationEventTarget(), { _, event, _ in
-    var id = EventHotKeyID()
-    GetEventParameter(event, EventParamName(kEventParamDirectObject), EventParamType(typeEventHotKeyID), nil, MemoryLayout<EventHotKeyID>.size, nil, &id)
-    if let mode = Mode(rawValue: id.id) { textFix.run(mode) }
-    return noErr
-}, 1, &eventType, nil, nil)
-
-register(key: kVK_ANSI_R, mode: .rephrase)
-register(key: kVK_ANSI_G, mode: .grammar)
-register(key: kVK_ANSI_T, mode: .translate)
-app.run()
