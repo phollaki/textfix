@@ -97,48 +97,29 @@
       </div>
 
       <div class="wrap">
-        <section class="reveal">
-          <h2>See it in action</h2>
-          <p class="lead">No copy and paste between windows. The new text replaces the old one.</p>
-          <div class="demo" aria-label="TextFix demo">
+        <section>
+          <h2 class="reveal">One shortcut for <em>everything</em></h2>
+          <p class="lead reveal">Select text and press Control + Option + Space. Pick an action or type your own, press Enter. The result lands right where you type.</p>
+          <div class="demo qa reveal" id="qa" aria-label="Quick actions demo">
             <div class="dots"><i></i><i></i><i></i></div>
-            <div class="demo-text" id="demo-text"></div>
+            <div class="demo-text" id="qa-text"></div>
             <div class="demo-bar">
-              <div class="keys" id="demo-keys"><kbd>⌃</kbd><kbd>⌥</kbd><kbd id="demo-key">G</kbd></div>
-              <div class="pill" id="demo-pill"><span class="spinner"></span><span id="demo-label">Fixing grammar…</span></div>
+              <div class="keys" id="qa-keys"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>Space</kbd></div>
+              <div class="pill" id="qa-pill"><span class="spinner"></span><span id="qa-label"></span></div>
+            </div>
+            <div class="palette" id="qa-palette" aria-hidden="true">
+              <div class="palette-search">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+                <span id="qa-query"></span><span class="caret"></span>
+              </div>
+              <ul id="qa-list"></ul>
+              <div class="palette-foot"><span><kbd>↑</kbd><kbd id="qa-down">↓</kbd> move</span><span><kbd id="qa-enter">↵</kbd> run</span><span><kbd>esc</kbd> close</span></div>
+            </div>
+            <div class="result" id="qa-result" aria-hidden="true">
+              <h4 id="qa-title"></h4>
+              <div id="qa-body"></div>
             </div>
           </div>
-        </section>
-
-        <section>
-          <h2 class="reveal">Three shortcuts. That's it.</h2>
-          <p class="lead reveal">Works in Mail, Slack, Teams, Notes, your browser and every other app where you can select text.</p>
-          <div class="grid">
-            <div class="card reveal" style="--d: 0s">
-              <div class="icon">Aa</div>
-              <h3>Rephrase</h3>
-              <p>Rewrites your text so it sounds like a native speaker wrote it. Keeps your meaning, your tone and every fact.</p>
-              <p class="note"><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>R</kbd></p>
-            </div>
-            <div class="card reveal" style="--d: 0.1s">
-              <div class="icon">✓</div>
-              <h3>Fix grammar</h3>
-              <p>Fixes every mistake in spelling, grammar and punctuation. It does not rephrase. Your words and your style stay.</p>
-              <p class="note"><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>G</kbd></p>
-            </div>
-            <div class="card reveal" style="--d: 0.2s">
-              <div class="icon">文</div>
-              <h3>Translate</h3>
-              <p>Translates the selection into the language you pick. 24 languages, faithful and correct.</p>
-              <p class="note"><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>T</kbd></p>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <h2 class="reveal">One more shortcut for everything else</h2>
-          <p class="lead reveal">Press Control + Option + Space to open quick actions. Type to search, press Enter to run.</p>
-          <img class="shot reveal" src="palette.png" width="560" height="534" alt="TextFix quick actions: Rephrase, Fix grammar, Translate, Make it shorter, TL;DR, Reply ideas, Explain and Prompt from my text" loading="lazy" />
           <div class="grid">
             <div class="card reveal" style="--d: 0s">
               <div class="icon">≡</div>
@@ -154,6 +135,61 @@
               <div class="icon">⚿</div>
               <h3>Hide names</h3>
               <p>Optional. Names, companies, emails, phone numbers and IBANs are replaced with placeholders before sending, and put back after.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="reveal">Stop copying text <em>into ChatGPT</em></h2>
+          <p class="lead reveal">No more switching windows, writing the same prompt again and pasting the answer back. One shortcut does all of it.</p>
+          <div class="versus reveal" id="versus">
+            <div class="card old">
+              <div class="versus-head"><h3>The old way</h3><span class="clock" id="old-clock">0:00</span></div>
+              <ol id="old-steps">
+                <li>Select the text and copy it</li>
+                <li>Switch to the browser and open ChatGPT</li>
+                <li>Paste it and type "Please rephrase this…"</li>
+                <li>Wait for the answer</li>
+                <li>Copy the answer</li>
+                <li>Switch back to your app</li>
+                <li>Select the old text and paste</li>
+              </ol>
+            </div>
+            <div class="card new">
+              <div class="versus-head"><h3>With TextFix</h3><span class="clock" id="new-clock">0:00</span></div>
+              <ol id="new-steps">
+                <li>Select the text</li>
+                <li>Press <kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>R</kbd></li>
+              </ol>
+              <div class="done" id="new-done">✓ Done. The new text is already in your app.</div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="reveal">Three shortcuts. <em>That's it.</em></h2>
+          <p class="lead reveal">Works in Mail, Slack, Teams, Notes, your browser and every other app where you can select text.</p>
+          <div class="grid">
+            <div class="card reveal" style="--d: 0s">
+              <div class="icon">Aa</div>
+              <h3>Rephrase</h3>
+              <p>Rewrites your text so it sounds like a native speaker wrote it. Keeps your meaning, your tone and every fact.</p>
+              <div class="sample"><s>We must align regarding this topic asap.</s><span>Let's agree on this soon.</span></div>
+              <p class="note"><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>R</kbd></p>
+            </div>
+            <div class="card reveal" style="--d: 0.1s">
+              <div class="icon">✓</div>
+              <h3>Fix grammar</h3>
+              <p>Fixes every mistake in spelling, grammar and punctuation. It does not rephrase. Your words and your style stay.</p>
+              <div class="sample"><s>Their is two option we can choose.</s><span>There are two options we can choose.</span></div>
+              <p class="note"><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>G</kbd></p>
+            </div>
+            <div class="card reveal" style="--d: 0.2s">
+              <div class="icon">文</div>
+              <h3>Translate</h3>
+              <p>Translates the selection into the language you pick. 24 languages, faithful and correct.</p>
+              <div class="sample"><s>Wir melden uns morgen bei Ihnen.</s><span>We'll get back to you tomorrow.</span></div>
+              <p class="note"><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>T</kbd></p>
             </div>
           </div>
         </section>
@@ -178,15 +214,15 @@
         </section>
 
         <section>
-          <h2 class="reveal">Pick your AI</h2>
+          <h2 class="reveal">Pick <em>your</em> AI</h2>
           <p class="lead reveal">Use the provider and the model you like. Switch any time in the settings.</p>
           <div class="providers reveal">
-            <span>OpenAI</span><span>Anthropic Claude</span><span>Google Gemini</span><span>Mistral</span><span>Groq</span><span>OpenRouter</span><span>Ollama on your Mac</span>
+            <span style="--i: 0">OpenAI</span><span style="--i: 1">Anthropic Claude</span><span style="--i: 2">Google Gemini</span><span style="--i: 3">Mistral</span><span style="--i: 4">Groq</span><span style="--i: 5">OpenRouter</span><span style="--i: 6">Ollama on your Mac</span>
           </div>
         </section>
 
         <section>
-          <h2 class="reveal">Free. Yours. Open.</h2>
+          <h2 class="reveal">Free. Yours. <em>Open.</em></h2>
           <p class="lead reveal">No subscription and no middleman.</p>
           <div class="grid">
             <div class="card reveal" style="--d: 0s">
@@ -288,57 +324,220 @@
         });
       }
 
-      const examples = [
-        { key: "G", label: "Fixing grammar…", before: "i has went to the store yesterday and buyed some milk, it were cold.", after: "I went to the store yesterday and bought some milk. It was cold." },
-        { key: "R", label: "Rephrasing…", before: "Please be advised that the meeting has been postponed to a later date to be determined.", after: "Heads up: we moved the meeting. We'll share the new date soon." },
-        { key: "T", label: "Translating…", before: "Holnap reggel korán kelek, mert a tárgyalás kilenckor kezdődik.", after: "I'm getting up early tomorrow because the meeting starts at nine." },
-      ];
-      const text = document.getElementById("demo-text");
-      const keys = document.getElementById("demo-keys");
-      const key = document.getElementById("demo-key");
-      const pill = document.getElementById("demo-pill");
-      const label = document.getElementById("demo-label");
       const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-      const type = async (value) => {
-        text.textContent = "";
-        for (const char of value) {
-          text.textContent += char;
-          await wait(18);
+      const qaActions = [
+        ["Rewrite", "Rephrase", "Sounds like a native speaker wrote it"],
+        ["Rewrite", "Fix grammar", "Fixes mistakes, keeps your words"],
+        ["Rewrite", "Translate to English", "Change the language in Settings"],
+        ["Rewrite", "Make it shorter", "Same message, fewer words"],
+        ["Understand", "TL;DR", "Short summary, your text stays"],
+        ["Understand", "Reply ideas", "Three short answers to choose from"],
+        ["Understand", "Explain", "What it means, in plain words"],
+        ["Create", "Prompt from my text", "Turns your notes into a clear AI prompt"],
+      ];
+      const qaMessage = "Hi Anna, the new office is not ready yet, so we move on the 14th instead of the 7th. Please pack your desk by Friday the 11th. The movers need a list of big items like monitors and chairs. Can you collect it from your team by Wednesday? Thanks, Mark";
+      const qaScenes = [
+        {
+          before: "Kurze Info: Die Lieferung verschiebt sich auf nächste Woche, weil ein Teil noch fehlt. Ich melde mich, sobald wir ein neues Datum haben.",
+          moves: 2,
+          label: "Translating…",
+          after: "Quick update: the delivery moves to next week because one part is still missing. I'll let you know when we have a new date.",
+        },
+        {
+          before: "Dear team, I would like to inform you that regarding the event we are having a delay due to the reason that the room is not yet available.",
+          moves: 0,
+          label: "Rephrasing…",
+          after: "Hi team, the event is delayed because the room is not available yet.",
+        },
+        {
+          before: "Hi Sarah, i attached the slides from yesterdays meeting. Let me know if their is anything we should change.",
+          moves: 1,
+          label: "Fixing grammar…",
+          after: "Hi Sarah, I attached the slides from yesterday's meeting. Let me know if there is anything we should change.",
+        },
+        {
+          before: qaMessage,
+          moves: 4,
+          label: "Summarizing…",
+          title: "TL;DR",
+          body: "- The office move is on the 14th, not the 7th.\n- Pack your desk by Friday the 11th.\nAction: Send Mark a list of your team's big items by Wednesday.",
+        },
+        {
+          before: qaMessage,
+          moves: 5,
+          label: "Writing replies…",
+          title: "Reply ideas",
+          replies: ["Hi Mark, sure, I'll send you the list by Wednesday. Thanks!", "Hi Mark, do you also need laptops and small items on the list?", "Hi Mark, I'm out on Wednesday. Is Thursday morning OK?"],
+        },
+        {
+          before: "plan 3 days in vienna with 2 kids age 6 and 9, budget 800 eur, museums and parks, no early mornings, we go by train",
+          query: "prompt",
+          label: "Writing prompt…",
+          title: "Prompt from my text",
+          body: "Plan a 3-day trip to Vienna for a family with two kids (6 and 9).\n\nRequirements:\n- Budget: 800 EUR in total.\n- Mix of museums and parks.\n- No early mornings.\n- We arrive and leave by train.\n\nOutput: a day-by-day plan with costs.",
+        },
+        {
+          before: "send me the report asap",
+          query: "make it more polite",
+          label: "Working…",
+          after: "Could you send me the report when you get a chance? Thanks a lot!",
+        },
+      ];
+      const qa = Object.fromEntries(["text", "keys", "pill", "label", "palette", "query", "list", "result", "title", "body", "down", "enter"].map((name) => [name, document.getElementById("qa-" + name)]));
+
+      const press = async (element) => {
+        element.classList.add("pressed");
+        await wait(160);
+        element.classList.remove("pressed");
+      };
+
+      const qaSelect = (selected) => qa.items.forEach((item, index) => item.classList.toggle("on", index === selected));
+
+      const qaList = (query) => {
+        const search = query.trim().toLowerCase();
+        const items = qaActions.filter(([, title, hint]) => !search || title.toLowerCase().includes(search) || hint.toLowerCase().includes(search));
+        if (search) items.push(["Your instruction", query, "Apply this to the selected text"]);
+        const rows = [];
+        qa.items = [];
+        items.forEach(([group, title, hint], index) => {
+          if (index === 0 || items[index - 1][0] !== group) {
+            const heading = document.createElement("li");
+            heading.className = "group";
+            heading.textContent = group;
+            rows.push(heading);
+          }
+          const item = document.createElement("li");
+          const name = document.createElement("b");
+          name.textContent = title;
+          const note = document.createElement("small");
+          note.textContent = hint;
+          item.append(name, note);
+          rows.push(item);
+          qa.items.push(item);
+        });
+        qa.list.replaceChildren(...rows);
+        qaSelect(0);
+        qa.query.textContent = query;
+        qa.query.classList.toggle("empty", !query);
+      };
+
+      const qaShowResult = (scene) => {
+        qa.title.textContent = scene.title;
+        const parts = scene.replies || [scene.body];
+        qa.body.replaceChildren(...parts.map((part) => {
+          const card = document.createElement("div");
+          card.className = "reply";
+          const words = document.createElement("p");
+          words.textContent = part;
+          const copy = document.createElement("span");
+          copy.className = "copy";
+          copy.textContent = scene.replies ? "Copy this reply" : "Copy";
+          card.append(words, copy);
+          return card;
+        }));
+        qa.result.classList.add("visible");
+      };
+
+      const qaPlay = async () => {
+        for (let i = 0; ; i = (i + 1) % qaScenes.length) {
+          const scene = qaScenes[i];
+          const mark = document.createElement("mark");
+          mark.textContent = scene.before;
+          qa.text.replaceChildren(mark);
+          await wait(1300);
+          await press(qa.keys);
+          qaList("");
+          qa.palette.classList.add("visible");
+          await wait(900);
+          const query = scene.query || "";
+          for (let length = 1; length <= query.length; length++) {
+            qaList(query.slice(0, length));
+            await wait(85);
+          }
+          for (let step = 1; step <= (scene.moves || 0); step++) {
+            qaSelect(step);
+            await press(qa.down);
+            await wait(260);
+          }
+          await wait(700);
+          qa.list.querySelector(".on").classList.add("run");
+          await press(qa.enter);
+          await wait(350);
+          qa.palette.classList.remove("visible");
+          qa.label.textContent = scene.label;
+          qa.pill.classList.add("visible");
+          await wait(1300);
+          qa.pill.classList.remove("visible");
+          if (scene.after) {
+            const result = document.createElement("span");
+            result.className = "fresh";
+            result.textContent = scene.after;
+            qa.text.replaceChildren(result);
+            await wait(3000);
+            continue;
+          }
+          qaShowResult(scene);
+          await wait(1800);
+          qa.body.querySelector(".copy").classList.add("done");
+          qa.body.querySelector(".copy").textContent = "Copied";
+          await wait(1800);
+          qa.result.classList.remove("visible");
+          await wait(300);
         }
       };
 
-      const play = async () => {
-        for (let i = 0; ; i = (i + 1) % examples.length) {
-          const example = examples[i];
-          key.textContent = example.key;
-          label.textContent = example.label;
-          await type(example.before);
-          await wait(900);
-          text.innerHTML = "";
-          const mark = document.createElement("mark");
-          mark.textContent = example.before;
-          text.append(mark);
-          await wait(800);
-          keys.classList.add("pressed");
-          await wait(250);
-          keys.classList.remove("pressed");
-          pill.classList.add("visible");
-          await wait(1300);
-          pill.classList.remove("visible");
-          text.innerHTML = "";
-          const result = document.createElement("span");
-          result.className = "fresh";
-          result.textContent = example.after;
-          text.append(result);
-          await wait(3200);
+      const versus = Object.fromEntries(["old-steps", "new-steps", "old-clock", "new-clock", "new-done"].map((name) => [name, document.getElementById(name)]));
+      const oldSteps = [...versus["old-steps"].children];
+      const newSteps = [...versus["new-steps"].children];
+      const showClock = (element, seconds) => (element.textContent = "0:" + String(seconds).padStart(2, "0"));
+
+      const runSteps = async (steps, clock, secondsPerStep) => {
+        let seconds = 0;
+        for (const step of steps) {
+          step.classList.add("on");
+          for (let tick = 0; tick < secondsPerStep; tick++) {
+            showClock(clock, ++seconds);
+            await wait(1000 / secondsPerStep);
+          }
         }
+      };
+
+      const versusPlay = async () => {
+        for (;;) {
+          [...oldSteps, ...newSteps].forEach((step) => step.classList.remove("on"));
+          versus["new-done"].classList.remove("visible");
+          showClock(versus["old-clock"], 0);
+          showClock(versus["new-clock"], 0);
+          await wait(1000);
+          await Promise.all([
+            runSteps(oldSteps, versus["old-clock"], 5),
+            runSteps(newSteps, versus["new-clock"], 1).then(() => versus["new-done"].classList.add("visible")),
+          ]);
+          await wait(3500);
+        }
+      };
+
+      const playWhenVisible = (element, play) => {
+        const observer = new IntersectionObserver((entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            observer.disconnect();
+            play();
+          }
+        }, { threshold: 0.3 });
+        observer.observe(element);
       };
 
       if (reduced) {
-        text.textContent = examples[0].after;
+        qa.text.textContent = qaScenes[3].before;
+        qaShowResult(qaScenes[3]);
+        [...oldSteps, ...newSteps].forEach((step) => step.classList.add("on"));
+        showClock(versus["old-clock"], 35);
+        showClock(versus["new-clock"], 2);
+        versus["new-done"].classList.add("visible");
       } else {
-        play();
+        playWhenVisible(document.getElementById("qa"), qaPlay);
+        playWhenVisible(document.getElementById("versus"), versusPlay);
       }
     </script>
   </body>
