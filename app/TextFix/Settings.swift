@@ -76,7 +76,7 @@ final class SettingsModel: ObservableObject {
     var ready: Bool { (!provider.needsKey || !apiKey.isEmpty) && !modelName.isEmpty }
 
     func request(for mode: Mode, instruction: String = "") -> RewriteRequest? {
-        guard ready else { return nil }
+        guard ready || mode == .redact else { return nil }
         let words = hiddenWords.split(whereSeparator: \.isNewline)
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .filter { !$0.isEmpty }
@@ -89,7 +89,7 @@ final class SettingsModel: ObservableObject {
             key: apiKey,
             glossary: glossary.trimmingCharacters(in: .whitespacesAndNewlines),
             style: style.trimmingCharacters(in: .whitespacesAndNewlines),
-            privacy: hideData ? PrivacyOptions(words: words, findNames: findNames) : nil
+            privacy: hideData || mode == .redact ? PrivacyOptions(words: words, findNames: findNames) : nil
         )
     }
 
@@ -272,18 +272,18 @@ struct SettingsView: View {
                 }
                 Text("Quick actions opens a list with more actions: TL;DR, reply ideas, explain, make it shorter, prompt from your text, or type your own instruction.")
                     .font(.caption).foregroundStyle(.secondary)
+                Text("Hide sensitive data replaces private data in the selected text with placeholders. It runs on your Mac, without AI, and needs no API key.")
+                    .font(.caption).foregroundStyle(.secondary)
             }
 
             Section("Privacy") {
                 Toggle("Hide sensitive data before sending", isOn: $model.hideData)
-                Text("Emails, phone numbers, IBANs, IP addresses and the names below are replaced with placeholders like [NAME_1]. TextFix puts the real values back after the answer.")
+                Text("Passwords, API keys, emails, phone numbers, addresses, IBANs, card numbers, ID numbers, IP addresses and the names below are replaced with placeholders like [NAME_1]. TextFix puts the real values back after the answer.")
                     .font(.caption).foregroundStyle(.secondary)
-                if model.hideData {
-                    editor("Always hide, one name or company per line", text: $model.hiddenWords)
-                    Toggle("Also find other names automatically", isOn: $model.findNames)
-                    Text("Uses Apple's on-device language detection. Works best in English and German. This lowers what leaves your Mac, but it can miss things. For full privacy, use Ollama.")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
+                editor("Always hide, one name or company per line", text: $model.hiddenWords)
+                Toggle("Also find other names automatically", isOn: $model.findNames)
+                Text("Uses Apple's on-device language detection. Works best in English, German and Hungarian. This lowers what leaves your Mac, but it can miss things. For full privacy, use Ollama.")
+                    .font(.caption).foregroundStyle(.secondary)
             }
 
             Section("Glossary and style") {

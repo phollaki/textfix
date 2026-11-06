@@ -57,6 +57,7 @@ final class PaletteState: ObservableObject {
             ("Rewrite", .grammar, "Fix grammar", "Fixes mistakes, keeps your words"),
             ("Rewrite", .translate, "Translate to \(language)", "Change the language in Settings"),
             ("Rewrite", .shorter, "Make it shorter", "Same message, fewer words"),
+            ("Rewrite", .redact, "Hide sensitive data", "No AI, stays on your Mac"),
             ("Understand", .tldr, "TL;DR", "Short summary, your text stays"),
             ("Understand", .replies, "Reply ideas", "Three short answers to choose from"),
             ("Understand", .explain, "Explain", "What it means, in plain words"),

@@ -133,8 +133,8 @@
             </div>
             <div class="card reveal" style="--d: 0.2s">
               <div class="icon">⚿</div>
-              <h3>Hide names</h3>
-              <p>Optional. Names, companies, emails, phone numbers and IBANs are replaced with placeholders before sending, and put back after.</p>
+              <h3>Hide before sending</h3>
+              <p>Optional. Names, companies, passwords, emails, phone numbers and IBANs are replaced with placeholders before sending, and put back after.</p>
             </div>
           </div>
         </section>
@@ -167,7 +167,7 @@
         </section>
 
         <section>
-          <h2 class="reveal">Three shortcuts. <em>That's it.</em></h2>
+          <h2 class="reveal">Four shortcuts. <em>That's it.</em></h2>
           <p class="lead reveal">Works in Mail, Slack, Teams, Notes, your browser and every other app where you can select text.</p>
           <div class="grid">
             <div class="card reveal" style="--d: 0s">
@@ -190,6 +190,13 @@
               <p>Translates the selection into the language you pick. 24 languages, faithful and correct.</p>
               <div class="sample"><s>Wir melden uns morgen bei Ihnen.</s><span>We'll get back to you tomorrow.</span></div>
               <p class="note"><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>T</kbd></p>
+            </div>
+            <div class="card reveal" style="--d: 0.3s; grid-column: 1 / -1">
+              <div class="icon">⚿</div>
+              <h3>Hide sensitive data, without AI</h3>
+              <p>Replaces names, passwords, API keys, emails, phone numbers, addresses, card numbers and IBANs with placeholders, right in your text. Then keep working with it, or paste it anywhere. This runs only on your Mac. Nothing is sent, and you don't need an API key.</p>
+              <div class="sample"><s>Hi Anna, John's login is password: hunter2. Call him at +49 151 1234567.</s><span>Hi [PERSON_1], [PERSON_2]'s login is password: [SECRET_1]. Call him at [PHONE_1].</span></div>
+              <p class="note"><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>H</kbd></p>
             </div>
           </div>
         </section>
@@ -258,8 +265,12 @@
             <p>Yes. Install <a href="https://ollama.com">Ollama</a>, download a model, and choose "Ollama (on this Mac)" in the settings. Your text never leaves your Mac.</p>
           </details>
           <details class="reveal">
-            <summary>How does "Hide sensitive data" work?</summary>
-            <p>Before sending, TextFix replaces the names on your "always hide" list, emails, phone numbers, IBANs and IP addresses with placeholders like [NAME_1]. It can also find other names on your Mac, which works best in English and German. The answer comes back with placeholders, and TextFix puts the real values back. This lowers what leaves your Mac, but it can miss things. For full privacy, use Ollama.</p>
+            <summary>Does "Hide sensitive data" send my text to an AI?</summary>
+            <p>No. Control + Option + H works only on your Mac, with pattern rules and Apple's on-device language tools. It replaces private data in the selected text with placeholders like [EMAIL_1], and the placeholders stay. It needs no API key. It can miss things, so read the result before you share it.</p>
+          </details>
+          <details class="reveal">
+            <summary>How does "Hide before sending" work?</summary>
+            <p>This is a setting for the AI actions. Before sending, TextFix replaces the names on your "always hide" list, passwords, API keys, emails, phone numbers, addresses, IBANs, card numbers and IP addresses with placeholders like [NAME_1]. It can also find other names on your Mac, which works best in English, German and Hungarian. The answer comes back with placeholders, and TextFix puts the real values back. This lowers what leaves your Mac, but it can miss things. For full privacy, use Ollama.</p>
           </details>
           <details class="reveal">
             <summary>Can TextFix use my own words and style?</summary>
@@ -325,12 +336,14 @@
       }
 
       const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      const qaWait = (ms) => wait(ms * 0.85);
 
       const qaActions = [
         ["Rewrite", "Rephrase", "Sounds like a native speaker wrote it"],
         ["Rewrite", "Fix grammar", "Fixes mistakes, keeps your words"],
         ["Rewrite", "Translate to English", "Change the language in Settings"],
         ["Rewrite", "Make it shorter", "Same message, fewer words"],
+        ["Rewrite", "Hide sensitive data", "No AI, stays on your Mac"],
         ["Understand", "TL;DR", "Short summary, your text stays"],
         ["Understand", "Reply ideas", "Three short answers to choose from"],
         ["Understand", "Explain", "What it means, in plain words"],
@@ -357,15 +370,21 @@
           after: "Hi Sarah, I attached the slides from yesterday's meeting. Let me know if there is anything we should change.",
         },
         {
-          before: qaMessage,
+          before: "Hi Anna, John's login is password: hunter2. Call him at +49 151 1234567 or write to john@acme.com.",
           moves: 4,
+          label: "Hiding data…",
+          after: "Hi [PERSON_1], [PERSON_2]'s login is password: [SECRET_1]. Call him at [PHONE_1] or write to [EMAIL_1].",
+        },
+        {
+          before: qaMessage,
+          moves: 5,
           label: "Summarizing…",
           title: "TL;DR",
           body: "- The office move is on the 14th, not the 7th.\n- Pack your desk by Friday the 11th.\nAction: Send Mark a list of your team's big items by Wednesday.",
         },
         {
           before: qaMessage,
-          moves: 5,
+          moves: 6,
           label: "Writing replies…",
           title: "Reply ideas",
           replies: ["Hi Mark, sure, I'll send you the list by Wednesday. Thanks!", "Hi Mark, do you also need laptops and small items on the list?", "Hi Mark, I'm out on Wednesday. Is Thursday morning OK?"],
@@ -445,45 +464,45 @@
           const mark = document.createElement("mark");
           mark.textContent = scene.before;
           qa.text.replaceChildren(mark);
-          await wait(1300);
+          await qaWait(1300);
           await press(qa.keys);
           qaList("");
           qa.palette.classList.add("visible");
-          await wait(900);
+          await qaWait(900);
           const query = scene.query || "";
           for (let length = 1; length <= query.length; length++) {
             qaList(query.slice(0, length));
-            await wait(85);
+            await qaWait(85);
           }
           for (let step = 1; step <= (scene.moves || 0); step++) {
             qaSelect(step);
             await press(qa.down);
-            await wait(260);
+            await qaWait(260);
           }
-          await wait(700);
+          await qaWait(700);
           qa.list.querySelector(".on").classList.add("run");
           await press(qa.enter);
-          await wait(350);
+          await qaWait(350);
           qa.palette.classList.remove("visible");
           qa.label.textContent = scene.label;
           qa.pill.classList.add("visible");
-          await wait(1300);
+          await qaWait(1300);
           qa.pill.classList.remove("visible");
           if (scene.after) {
             const result = document.createElement("span");
             result.className = "fresh";
             result.textContent = scene.after;
             qa.text.replaceChildren(result);
-            await wait(3000);
+            await qaWait(3000);
             continue;
           }
           qaShowResult(scene);
-          await wait(1800);
+          await qaWait(1800);
           qa.body.querySelector(".copy").classList.add("done");
           qa.body.querySelector(".copy").textContent = "Copied";
-          await wait(1800);
+          await qaWait(1800);
           qa.result.classList.remove("visible");
-          await wait(300);
+          await qaWait(300);
         }
       };
 
@@ -529,8 +548,8 @@
       };
 
       if (reduced) {
-        qa.text.textContent = qaScenes[3].before;
-        qaShowResult(qaScenes[3]);
+        qa.text.textContent = qaScenes[4].before;
+        qaShowResult(qaScenes[4]);
         [...oldSteps, ...newSteps].forEach((step) => step.classList.add("on"));
         showClock(versus["old-clock"], 35);
         showClock(versus["new-clock"], 2);

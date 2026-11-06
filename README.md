@@ -14,6 +14,7 @@ It works in Mail, Slack, Teams, Notes, your browser and every other app where yo
 | Control+Option+R | Rephrase so it sounds like a native speaker wrote it |
 | Control+Option+G | Fix every mistake, without rephrasing |
 | Control+Option+T | Translate to the language you pick (24 languages) |
+| Control+Option+H | Hide sensitive data, on your Mac, without AI |
 | Control+Option+Space | Open quick actions |
 
 You can change every shortcut in the settings.
@@ -28,18 +29,35 @@ Use the arrow keys and Enter, or type to search.
 | Action | Result |
 |---|---|
 | Make it shorter | Replaces the selection |
+| Hide sensitive data | Replaces private data in the selection with placeholders. No AI. |
 | Prompt from my text | Turns rough notes into a clear AI prompt. Shows it with a Copy button. Your text stays. |
 | Your own instruction | Type anything, for example "make it more polite", and press Enter |
 | TL;DR | Shows up to three bullet points. Your text stays. |
 | Reply ideas | Shows three short replies. Click one to copy it. |
 | Explain | Explains the text in plain words. Your text stays. |
 
+### Hide sensitive data
+
+Select text and press Control+Option+H.
+TextFix replaces private data with placeholders, right in your text, and you can keep working with it.
+The same value always gets the same placeholder.
+
+```
+Hi Anna, John's login is password: hunter2. Call him at +49 151 1234567.
+Hi [PERSON_1], [PERSON_2]'s login is password: [SECRET_1]. Call him at [PHONE_1].
+```
+
+This runs only on your Mac, with pattern rules and Apple's on-device language tools.
+Nothing is sent to an AI, and you don't need an API key.
+It finds names, companies, passwords, API keys, tokens, login URLs, emails, phone numbers, addresses, IBANs, card numbers, ID numbers and IP addresses, plus your "always hide" list.
+It can miss things, so read the result before you share it.
+In Hungarian and other languages without Apple name detection, it treats capitalized words as names, so it can also hide a word that is not a name.
+
 ### Privacy, glossary and style
 
 These are optional, in the settings.
 
-- Hide sensitive data: before sending, TextFix replaces names from your list, emails, phone numbers, IBANs and IP addresses with placeholders like `[NAME_1]`, and puts the real values back in the answer.
-  It can also find other names with Apple's on-device language detection, which works best in English and German.
+- Hide before sending: TextFix replaces the same private data with placeholders like `[NAME_1]` before it sends the text, and puts the real values back in the answer.
   This lowers what leaves your Mac, but it can miss things.
   For full privacy, use Ollama.
 - Glossary: one term per line.
