@@ -2,7 +2,7 @@ import AppKit
 import ApplicationServices
 
 enum Mode {
-    case rephrase, grammar, translate, shorter, prompt, tldr, replies, explain, custom
+    case rephrase, grammar, translate, shorter, prompt, tldr, replies, explain, custom, redact
 
     var title: String {
         switch self {
@@ -15,6 +15,7 @@ enum Mode {
         case .replies: return "Reply ideas"
         case .explain: return "Explain"
         case .custom: return "Your instruction"
+        case .redact: return "Hide sensitive data"
         }
     }
 
@@ -29,6 +30,7 @@ enum Mode {
         case .replies: return "Writing replies…"
         case .explain: return "Explaining…"
         case .custom: return "Working…"
+        case .redact: return "Hiding data…"
         }
     }
 
@@ -134,7 +136,7 @@ final class TextFix: NSObject, NSApplicationDelegate, @unchecked Sendable {
     @MainActor
     func run(_ hotKey: HotKey) {
         guard !busy else { return }
-        guard AXIsProcessTrusted(), let model = settings?.model, model.ready else {
+        guard AXIsProcessTrusted(), let model = settings?.model, model.ready || hotKey == .redact else {
             settings?.show()
             return
         }

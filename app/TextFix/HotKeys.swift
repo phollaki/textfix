@@ -6,6 +6,7 @@ enum HotKey: UInt32, CaseIterable {
     case grammar = 2
     case translate = 3
     case palette = 4
+    case redact = 5
 
     var argument: String {
         switch self {
@@ -13,6 +14,7 @@ enum HotKey: UInt32, CaseIterable {
         case .grammar: return "grammar"
         case .translate: return "translate"
         case .palette: return "palette"
+        case .redact: return "redact"
         }
     }
 
@@ -22,6 +24,7 @@ enum HotKey: UInt32, CaseIterable {
         case .grammar: return "Fix grammar"
         case .translate: return "Translate"
         case .palette: return "Quick actions"
+        case .redact: return "Hide sensitive data"
         }
     }
 
@@ -31,6 +34,7 @@ enum HotKey: UInt32, CaseIterable {
         case .grammar: return .grammar
         case .translate: return .translate
         case .palette: return nil
+        case .redact: return .redact
         }
     }
 
@@ -41,6 +45,7 @@ enum HotKey: UInt32, CaseIterable {
         case .grammar: return Shortcut(keyCode: UInt32(kVK_ANSI_G), modifiers: modifiers, key: "G")
         case .translate: return Shortcut(keyCode: UInt32(kVK_ANSI_T), modifiers: modifiers, key: "T")
         case .palette: return Shortcut(keyCode: UInt32(kVK_Space), modifiers: modifiers, key: "Space")
+        case .redact: return Shortcut(keyCode: UInt32(kVK_ANSI_H), modifiers: modifiers, key: "H")
         }
     }
 }
